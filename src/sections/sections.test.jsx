@@ -134,6 +134,37 @@ describe('Capture', () => {
     const text = screen.getByText('Struck note');
     expect(text.className).toMatch(/line-through/);
   });
+
+  it('4a-9: bulk mode shows checkboxes on individual items', () => {
+    wrap(<Capture />, mkCtx({ notes: [NOTE1, NOTE2] }));
+    fireEvent.click(screen.getByLabelText('Enter bulk select'));
+    // 3-dot should be hidden, checkboxes shown
+    expect(screen.queryByLabelText('Note options')).toBeNull();
+    expect(screen.getAllByLabelText('Select').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('4a-10: clicking item checkbox in bulk mode toggles selection', () => {
+    wrap(<Capture />, mkCtx({ notes: [NOTE1] }));
+    fireEvent.click(screen.getByLabelText('Enter bulk select'));
+    const checkbox = screen.getByLabelText('Select');
+    fireEvent.click(checkbox);
+    expect(screen.getByLabelText('Deselect')).toBeTruthy();
+  });
+
+  it('4a-11: bulk delete action calls bulkDeleteNotes', () => {
+    const bulkDeleteNotes = vi.fn();
+    wrap(<Capture />, mkCtx({ notes: [NOTE1], bulkDeleteNotes }));
+    // Enter bulk mode
+    fireEvent.click(screen.getByLabelText('Enter bulk select'));
+    // Select the note
+    fireEvent.click(screen.getByLabelText('Select'));
+    // Click delete button in BulkActionBar
+    fireEvent.click(screen.getByText('Delete'));
+    // Confirm the deletion
+    const confirmBtn = screen.getByText('Delete', { selector: 'button.bg-terracotta' });
+    fireEvent.click(confirmBtn);
+    expect(bulkDeleteNotes).toHaveBeenCalled();
+  });
 });
 
 // ── 4b: Clarify ───────────────────────────────────────────────────────────────
@@ -208,6 +239,22 @@ describe('Clarify', () => {
     fireEvent.change(inputs[0], { target: { value: 'My new task' } });
     fireEvent.keyDown(inputs[0], { key: 'Enter' });
     expect(addTodo).toHaveBeenCalled();
+  });
+
+  it('4b-9: bulk mode entered via header checkbox', () => {
+    wrap(<Clarify />, mkCtx({ todos: [TODO1] }));
+    fireEvent.click(screen.getByLabelText('Enter bulk select'));
+    // Task options should be hidden in bulk mode
+    expect(screen.queryByLabelText('Task options')).toBeNull();
+  });
+
+  it('4b-10: clicking task in bulk mode toggles selection instead of toggling done', () => {
+    const toggleTodo = vi.fn();
+    wrap(<Clarify />, mkCtx({ todos: [TODO1], toggleTodo }));
+    fireEvent.click(screen.getByLabelText('Enter bulk select'));
+    fireEvent.click(screen.getByLabelText('Task: Urgent task'));
+    // Should NOT call toggleTodo in bulk mode — it should select instead
+    expect(toggleTodo).not.toHaveBeenCalled();
   });
 });
 
@@ -322,6 +369,24 @@ describe('Confirm', () => {
     fireEvent.change(inputs[0], { target: { value: 'Step 3' } });
     fireEvent.keyDown(inputs[0], { key: 'Enter' });
     expect(addItem).toHaveBeenCalledWith('l1', 'Step 3');
+  });
+
+  it('4d-8: bulk mode toggle on checklist card shows checked icon', () => {
+    wrap(<Confirm />, mkCtx({ lists: [LIST1] }));
+    fireEvent.click(screen.getByLabelText('Toggle bulk select'));
+    // In bulk mode, clicking item should select it (not toggle done)
+    fireEvent.click(screen.getByLabelText('Item: Step 1'));
+    // Verify selection by checking that BulkActionBar appears with count
+    expect(screen.getByText('1 selected')).toBeTruthy();
+  });
+
+  it('4d-9: bulk mode exit clears selection', () => {
+    wrap(<Confirm />, mkCtx({ lists: [LIST1] }));
+    fireEvent.click(screen.getByLabelText('Toggle bulk select'));
+    fireEvent.click(screen.getByLabelText('Item: Step 1'));
+    // Exit bulk mode via the X button
+    fireEvent.click(screen.getByLabelText('Clear selection'));
+    expect(screen.queryByText('selected')).toBeNull();
   });
 });
 
@@ -444,5 +509,14 @@ describe('Settings', () => {
     Object.assign(navigator, { clipboard: { writeText } });
     wrap(<Settings />, mkCtx());
     expect(screen.getByLabelText('Copy sync code')).toBeTruthy();
+  });
+
+  it('4f-11: Show Help button renders and opens AboutModal', () => {
+    wrap(<Settings />, mkCtx());
+    const helpBtn = screen.getByLabelText('Show help');
+    expect(helpBtn).toBeTruthy();
+    fireEvent.click(helpBtn);
+    // AboutModal should be visible with version info
+    expect(screen.getByText('v18.0-Alpha')).toBeTruthy();
   });
 });

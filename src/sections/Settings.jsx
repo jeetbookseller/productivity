@@ -10,6 +10,7 @@ import { dlFile, notify, shareItem, PRESETS, encodeSync, decodeSync } from '../l
 import { QRCanvas } from '../components/QRCanvas.jsx';
 import { I } from '../components/icons.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
+import { AboutModal } from '../components/AboutModal.jsx';
 
 // Lazy-load TestRunner
 const TestRunner = lazy(() => import('../components/TestRunner.jsx').catch(() => ({
@@ -86,6 +87,9 @@ export function Settings() {
   const [qrOpen, setQrOpen] = useState(false);
   const [qrCode, setQrCode] = useState('');
   const [importCode, setImportCode] = useState('');
+
+  // Help modal
+  const [helpOpen, setHelpOpen] = useState(false);
 
   // PWA install
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -201,7 +205,7 @@ export function Settings() {
                 className={`flex-1 flex flex-col items-center gap-1 py-3 rounded-xl border font-semibold text-xs transition-all
                   ${theme === t.key
                     ? 'bg-sage/10 border-sage/50 text-sage'
-                    : 'bg-white border-sand text-bark/60 hover:border-bark/30'
+                    : 'bg-surface border-sand text-bark/60 hover:border-bark/30'
                   }`}
                 aria-label={`Theme: ${t.label}`}
               >
@@ -223,7 +227,7 @@ export function Settings() {
                 className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all
                   ${preset === p.key
                     ? 'bg-bark text-cream border-bark'
-                    : 'bg-white text-bark/60 border-sand hover:border-bark/30'
+                    : 'bg-surface text-bark/60 border-sand hover:border-bark/30'
                   }`}
                 aria-label={`Preset: ${p.label}`}
               >
@@ -240,7 +244,7 @@ export function Settings() {
               className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all
                 ${preset === 'custom'
                   ? 'bg-bark text-cream border-bark'
-                  : 'bg-white text-bark/60 border-sand hover:border-bark/30'
+                  : 'bg-surface text-bark/60 border-sand hover:border-bark/30'
                 }`}
               aria-label="Preset: Custom"
             >
@@ -371,6 +375,19 @@ export function Settings() {
           </Card>
         )}
 
+        {/* ── Help ─────────────────────────────────────────────────────── */}
+        <Card title="Help">
+          <button
+            onClick={() => setHelpOpen(true)}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-sand
+              font-semibold text-sm text-bark hover:bg-cream transition-colors text-left"
+            aria-label="Show help"
+          >
+            <I.Info width={16} height={16} />
+            Show Help Guide
+          </button>
+        </Card>
+
         {/* ── Explainer ─────────────────────────────────────────────────── */}
         <div className={isDesk ? 'col-span-2' : ''}>
           <Card title="How it works">
@@ -448,6 +465,8 @@ export function Settings() {
           </div>
         </div>
       )}
+
+      <AboutModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }

@@ -128,6 +128,11 @@ export function Confirm() {
           (lists.find((l) => l.id === bulkListId)?.items.length || 0) > 0 &&
           selected.size === (lists.find((l) => l.id === bulkListId)?.items.length || 0)
         }
+        someSelected={
+          bulkListId !== null &&
+          selected.size > 0 &&
+          selected.size < (lists.find((l) => l.id === bulkListId)?.items.length || 0)
+        }
         onToggleBulk={exitBulk}
         onSelectAll={() => {
           const list = lists.find((l) => l.id === bulkListId);
@@ -255,7 +260,7 @@ function ChecklistCard({
   const sections = [...new Set(list.items.map((i) => i.section || ''))];
 
   return (
-    <div className="card overflow-hidden">
+    <div className={`card overflow-hidden ${bulkMode ? 'ring-2 ring-sage/40' : ''}`}>
       {/* Card header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-sand/60">
         <button
@@ -263,7 +268,10 @@ function ChecklistCard({
           className={`flex-shrink-0 ${bulkMode ? 'text-sage' : 'text-bark/30 hover:text-bark/60'}`}
           aria-label="Toggle bulk select"
         >
-          <I.Checkbox width={18} height={18} />
+          {bulkMode
+            ? <I.CheckboxChecked width={18} height={18} />
+            : <I.Checkbox width={18} height={18} />
+          }
         </button>
         <button
           onClick={onToggleActive}

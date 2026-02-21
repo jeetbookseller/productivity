@@ -98,4 +98,25 @@ describe('App Shell', () => {
     // AboutModal version string must not be visible
     expect(screen.queryByText('v18.0-Alpha')).toBeNull();
   });
+
+  it('T2-20: ThemeProv sets data-theme attribute on document', () => {
+    localStorage.setItem('ph_theme', JSON.stringify('dark'));
+    render(<App />);
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+
+  it('T2-21: timer badge shows formatted countdown value', () => {
+    localStorage.setItem('ph_focusTimerState', JSON.stringify({
+      mode: 'work',
+      left: 600,
+      run: true,
+      endAt: Date.now() + 600_000,
+      startAt: Date.now(),
+      elapsed: 0,
+    }));
+    render(<App />);
+    const badge = screen.getByTestId('nav-timer-badge');
+    // Should show roughly 10:00 (may be 09:59 due to timing)
+    expect(badge.textContent).toMatch(/\d{2}:\d{2}/);
+  });
 });

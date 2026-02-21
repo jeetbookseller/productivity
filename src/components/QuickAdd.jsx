@@ -24,7 +24,7 @@ export function QuickAdd({ onAdd, placeholder = 'Add item…' }) {
   };
 
   return (
-    <div className="flex items-center gap-2 px-4 py-2 bg-white border border-sand rounded-xl shadow-sm">
+    <div className="flex items-center gap-2 px-4 py-2 bg-surface border border-sand rounded-xl shadow-sm">
       <input
         ref={inputRef}
         type="text"

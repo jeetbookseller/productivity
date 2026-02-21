@@ -32,7 +32,7 @@ export function ConfirmDialog({
       <div className="absolute inset-0 bg-bark/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-5 anim-in">
+      <div className="relative bg-surface rounded-2xl shadow-xl w-full max-w-sm p-5 anim-in">
         <p className="text-sm font-semibold text-bark mb-5 leading-relaxed">{message}</p>
 
         <div className="flex gap-2 justify-end">

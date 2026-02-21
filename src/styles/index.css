@@ -2,22 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* CSS custom properties — color palette */
+/* CSS custom properties — color palette (RGB channels for Tailwind opacity) */
 :root {
-  --sage: #7CB69D;
-  --terracotta: #E07A5F;
-  --ocean: #5A9BBF;
-  --lavender: #9B8AA6;
-  --sand: #E8DFD0;
-  --cream: #F7F5F0;
-  --bark: #3D352D;
+  --sage: 124 182 157;
+  --terracotta: 224 122 95;
+  --ocean: 90 155 191;
+  --lavender: 155 138 166;
+  --sand: 232 223 208;
+  --cream: 247 245 240;
+  --bark: 61 53 45;
+  --surface: 255 255 255;
+}
+
+/* Dark theme overrides */
+[data-theme="dark"] {
+  --sand: 61 53 45;
+  --cream: 26 22 20;
+  --bark: 240 237 232;
+  --surface: 42 36 32;
 }
 
 /* Base font */
 body {
   font-family: 'Nunito', sans-serif;
-  background-color: var(--cream);
-  color: var(--bark);
+  background-color: rgb(var(--cream));
+  color: rgb(var(--bark));
 }
 
 /* Animations */
@@ -36,6 +45,7 @@ body {
 /* Flat card utility — replaces glassmorphism (.glass / .gcard) */
 @layer components {
   .card {
-    @apply bg-white border border-sand rounded-2xl shadow-sm;
+    background-color: rgb(var(--surface));
+    @apply border border-sand rounded-2xl shadow-sm;
   }
 }

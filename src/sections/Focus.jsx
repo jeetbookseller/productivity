@@ -150,7 +150,7 @@ export function Focus() {
       {/* Timer panel */}
       <div className={`flex flex-col items-center justify-center p-8 gap-6 ${isDesk ? 'md:flex-1' : ''}`}>
         {/* Mode buttons */}
-        <div className="flex gap-2 bg-white/70 rounded-2xl p-1 border border-sand">
+        <div className="flex gap-2 bg-surface/70 rounded-2xl p-1 border border-sand">
           {Object.values(MODES).map((m) => (
             <button
               key={m.key}
@@ -180,7 +180,7 @@ export function Focus() {
         <div className="flex items-center gap-4">
           <button
             onClick={reset}
-            className="p-3 rounded-full bg-white border border-sand text-bark/60 hover:text-bark transition-colors"
+            className="p-3 rounded-full bg-surface border border-sand text-bark/60 hover:text-bark transition-colors"
             aria-label="Reset timer"
           >
             <I.Reset width={20} height={20} />
@@ -203,7 +203,7 @@ export function Focus() {
             className={`p-3 rounded-full border transition-colors
               ${wakeLock
                 ? 'bg-sage/10 border-sage/30 text-sage'
-                : 'bg-white border-sand text-bark/40 hover:text-bark'
+                : 'bg-surface border-sand text-bark/40 hover:text-bark'
               }`}
             aria-label={wakeLock ? 'Disable wake lock' : 'Enable wake lock'}
             title="Screen Wake Lock"
@@ -248,7 +248,7 @@ export function Focus() {
               {queueTodos.map((todo) => (
                 <li
                   key={todo.id}
-                  className="flex items-center gap-2 p-3 bg-white rounded-xl border border-sand text-sm font-semibold text-bark"
+                  className="flex items-center gap-2 p-3 bg-surface rounded-xl border border-sand text-sm font-semibold text-bark"
                 >
                   <I.Zap width={13} height={13} className="text-ocean flex-shrink-0" />
                   <span className="flex-1 truncate">{todo.text}</span>
@@ -340,7 +340,7 @@ function PresetChip({ presetKey, label }) {
       className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border
         ${active
           ? 'bg-bark text-cream border-bark'
-          : 'bg-white text-bark/60 border-sand hover:border-bark/30'
+          : 'bg-surface text-bark/60 border-sand hover:border-bark/30'
         }`}
       aria-label={`${label} preset`}
     >
