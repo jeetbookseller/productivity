@@ -351,7 +351,7 @@ export function Settings() {
 
 function Card({ title, children }) {
   return (
-    <div className="bg-white border border-sand rounded-2xl p-4 shadow-sm">
+    <div className="card p-4">
       <h3 className="text-sm font-bold text-bark mb-3">{title}</h3>
       {children}
     </div>

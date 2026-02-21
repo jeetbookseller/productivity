@@ -255,7 +255,7 @@ function ChecklistCard({
   const sections = [...new Set(list.items.map((i) => i.section || ''))];
 
   return (
-    <div className="bg-white border border-sand rounded-2xl overflow-hidden shadow-sm">
+    <div className="card overflow-hidden">
       {/* Card header */}
       <div className="flex items-center gap-2 px-4 py-3 border-b border-sand/60">
         <button
