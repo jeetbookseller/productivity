@@ -134,6 +134,26 @@ describe('dlFile()', () => {
   });
 });
 
+// ── encodeSync() / decodeSync() tests ─────────────────────────────────────────
+
+import { encodeSync, decodeSync } from './utils.js';
+
+describe('encodeSync / decodeSync', () => {
+  it('T7-1: encodeSync → decodeSync round-trip deep-equals original', () => {
+    const data = { todos: [{ id: '1', text: 'hello' }], notes: [], lists: [] };
+    const code = encodeSync(data);
+    expect(typeof code).toBe('string');
+    expect(code.length).toBeGreaterThan(0);
+    const decoded = decodeSync(code);
+    expect(decoded).toEqual(data);
+  });
+
+  it('T7-1b: decodeSync returns null for invalid input', () => {
+    expect(decodeSync('not-valid-base64!!!')).toBeNull();
+    expect(decodeSync('')).toBeNull();
+  });
+});
+
 describe('shareItem()', () => {
   it('shareItem falls back to clipboard when navigator.share is unavailable', async () => {
     // Ensure navigator.share is not set
