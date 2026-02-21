@@ -141,11 +141,11 @@ export function Review() {
           <section aria-label="Streak">
             <h3 className="text-xs font-bold text-bark/50 uppercase tracking-wide mb-3">Streak</h3>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white border border-sand rounded-2xl p-4 text-center">
+              <div className="card p-4 text-center">
                 <p className="text-3xl font-bold text-sage">{currentStreak}</p>
                 <p className="text-xs font-semibold text-bark/50 mt-1">Current streak</p>
               </div>
-              <div className="bg-white border border-sand rounded-2xl p-4 text-center">
+              <div className="card p-4 text-center">
                 <p className="text-3xl font-bold text-ocean">{longestStreak}</p>
                 <p className="text-xs font-semibold text-bark/50 mt-1">Longest streak</p>
               </div>
@@ -158,7 +158,7 @@ export function Review() {
               Activity — last 13 weeks
             </h3>
             <div
-              className="bg-white border border-sand rounded-2xl p-4 overflow-x-auto"
+              className="card p-4 overflow-x-auto"
               data-testid="heatmap"
             >
               <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(13, 1fr)' }}>
@@ -194,7 +194,7 @@ export function Review() {
             <h3 className="text-xs font-bold text-bark/50 uppercase tracking-wide mb-3">
               Task Distribution
             </h3>
-            <div className="bg-white border border-sand rounded-2xl p-4 space-y-3">
+            <div className="card p-4 space-y-3">
               {quadDist.map(({ key, label, count, pct, badge }) => (
                 <div key={key}>
                   <div className="flex items-center justify-between mb-1">
@@ -220,7 +220,7 @@ export function Review() {
           {/* Insights */}
           <section aria-label="Insights">
             <h3 className="text-xs font-bold text-bark/50 uppercase tracking-wide mb-3">Insights</h3>
-            <div className="bg-white border border-sand rounded-2xl p-4 space-y-3">
+            <div className="card p-4 space-y-3">
               {insights.map((msg, i) => (
                 <p key={i} className="text-sm font-semibold text-bark leading-relaxed">
                   {msg}
@@ -232,7 +232,7 @@ export function Review() {
           {/* All-time total */}
           <section aria-label="All-time stats">
             <h3 className="text-xs font-bold text-bark/50 uppercase tracking-wide mb-3">All Time</h3>
-            <div className="bg-white border border-sand rounded-2xl p-4 flex items-center gap-4">
+            <div className="card p-4 flex items-center gap-4">
               <I.Timer width={24} height={24} className="text-terracotta flex-shrink-0" />
               <div>
                 <p className="text-2xl font-bold text-bark">{poms}</p>
@@ -250,7 +250,7 @@ export function Review() {
 
 function MetricCard({ label, value, icon, color }) {
   return (
-    <div className="bg-white border border-sand rounded-2xl p-4 flex flex-col items-center gap-1">
+    <div className="card p-4 flex flex-col items-center gap-1">
       <span className={`text-${color}`}>{icon}</span>
       <p className="text-2xl font-bold text-bark">{value}</p>
       <p className="text-xs font-semibold text-bark/50 text-center">{label}</p>
