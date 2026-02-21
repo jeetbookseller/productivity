@@ -36,7 +36,7 @@ export function ContextMenu({ open, items = [], onClose, anchorRect, isDesktop }
       {isDesktop && anchorRect ? (
         // Desktop: positioned panel
         <div
-          className="z-50 bg-white border border-sand rounded-xl shadow-lg py-1 min-w-[160px] anim-in"
+          className="z-50 bg-surface border border-sand rounded-xl shadow-lg py-1 min-w-[160px] anim-in"
           style={panelStyle}
         >
           {items.map((item, idx) => (
@@ -53,7 +53,7 @@ export function ContextMenu({ open, items = [], onClose, anchorRect, isDesktop }
         </div>
       ) : (
         // Mobile: bottom sheet
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-lg anim-in pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-2xl shadow-lg anim-in pb-safe">
           <div className="w-10 h-1 bg-sand rounded-full mx-auto mt-3 mb-2" />
           {items.map((item, idx) => (
             <button

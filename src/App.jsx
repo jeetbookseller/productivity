@@ -3,7 +3,7 @@
  * Provides AppDataContext, ThemeProv, tab routing, nav (mobile bottom bar /
  * desktop sidebar), About modal, and live timer badge.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AppDataProvider } from './components/AppDataProvider.jsx';
 import { useAppDataContext } from './hooks/useAppData.js';
 import { usePersistedState } from './hooks/usePersistedState.js';
@@ -117,9 +117,22 @@ function AppShell() {
     setSeenAbout(true);
   };
 
+  // Live-updating timer badge for nav
+  const [timerLeft, setTimerLeft] = useState(() => liveLeft(timerState));
+
+  useEffect(() => {
+    if (!timerState.run) {
+      setTimerLeft(timerState.left);
+      return;
+    }
+    const tick = () => setTimerLeft(liveLeft(timerState));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [timerState.run, timerState.endAt, timerState.left]);
+
   // Show timer badge in nav when timer is running and we're not on Focus tab
   const showTimerBadge = timerState.run && tab !== 'focus';
-  const timerLeft = liveLeft(timerState);
 
   const ActiveSection = SECTIONS[tab] || Capture;
 
@@ -142,7 +155,7 @@ function AppShell() {
       {isWide ? (
         /* ── Desktop: sidebar layout ──────────────────────────────────────── */
         <div className="flex h-screen bg-cream overflow-hidden">
-          <aside className="w-48 bg-white border-r border-sand flex flex-col py-4 gap-1 px-2 flex-shrink-0">
+          <aside className="w-48 bg-surface border-r border-sand flex flex-col py-4 gap-1 px-2 flex-shrink-0">
             <div className="px-3 pb-4 mb-2 border-b border-sand">
               <p className="text-[10px] font-bold text-bark/40 uppercase tracking-wide">Productivity</p>
               <h1 className="text-sm font-extrabold text-bark">Hub</h1>
@@ -163,7 +176,7 @@ function AppShell() {
           </main>
           <nav
             aria-label="Bottom navigation"
-            className="bg-white border-t border-sand flex justify-around px-1 pt-1 pb-safe flex-shrink-0"
+            className="bg-surface border-t border-sand flex justify-around px-1 pt-1 pb-safe flex-shrink-0"
           >
             {navButtons}
           </nav>

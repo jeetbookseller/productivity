@@ -52,7 +52,7 @@ export function EditModal({
       <div className="absolute inset-0 bg-bark/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md p-5 anim-in">
+      <div className="relative bg-surface rounded-2xl shadow-xl w-full max-w-md p-5 anim-in">
         {title && (
           <h3 className="text-base font-bold text-bark mb-3">{title}</h3>
         )}

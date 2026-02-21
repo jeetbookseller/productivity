@@ -134,6 +134,139 @@ describe('useAppData — lists (Confirm)', () => {
   });
 });
 
+describe('useAppData — notes CRUD', () => {
+  it('T1-16: editNote updates the note text', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addNote('original').id; });
+    act(() => { result.current.editNote(id, 'updated'); });
+    expect(result.current.notes.find((n) => n.id === id).text).toBe('updated');
+  });
+
+  it('T1-17: strikeNote toggles the struck field', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addNote('strike me').id; });
+    expect(result.current.notes.find((n) => n.id === id).struck).toBe(false);
+    act(() => { result.current.strikeNote(id); });
+    expect(result.current.notes.find((n) => n.id === id).struck).toBe(true);
+  });
+
+  it('T1-18: bulkDeleteNotes removes multiple notes', () => {
+    const { result } = renderHook(() => useAppData());
+    let id1, id2, id3;
+    act(() => { id1 = result.current.addNote('a').id; });
+    act(() => { id2 = result.current.addNote('b').id; });
+    act(() => { id3 = result.current.addNote('c').id; });
+    act(() => { result.current.bulkDeleteNotes([id1, id3]); });
+    expect(result.current.notes).toHaveLength(1);
+    expect(result.current.notes[0].id).toBe(id2);
+  });
+
+  it('T1-19: bulkStrikeNotes strikes multiple notes', () => {
+    const { result } = renderHook(() => useAppData());
+    let id1, id2;
+    act(() => { id1 = result.current.addNote('x').id; });
+    act(() => { id2 = result.current.addNote('y').id; });
+    act(() => { result.current.bulkStrikeNotes([id1, id2]); });
+    expect(result.current.notes.every((n) => n.struck)).toBe(true);
+  });
+});
+
+describe('useAppData — todos CRUD', () => {
+  it('T1-20: editTodo updates todo fields', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addTodo('edit me', 'ui').id; });
+    act(() => { result.current.editTodo(id, { text: 'edited', cat: 'health' }); });
+    const todo = result.current.todos.find((t) => t.id === id);
+    expect(todo.text).toBe('edited');
+    expect(todo.cat).toBe('health');
+  });
+
+  it('T1-21: moveTodo changes the quadrant', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addTodo('move me', 'ui').id; });
+    act(() => { result.current.moveTodo(id, 'nn'); });
+    expect(result.current.todos.find((t) => t.id === id).quad).toBe('nn');
+  });
+
+  it('T1-22: bulkDeleteTodos removes multiple todos', () => {
+    const { result } = renderHook(() => useAppData());
+    let id1, id2, id3;
+    act(() => { id1 = result.current.addTodo('a').id; });
+    act(() => { id2 = result.current.addTodo('b').id; });
+    act(() => { id3 = result.current.addTodo('c').id; });
+    act(() => { result.current.bulkDeleteTodos([id1, id3]); });
+    expect(result.current.todos).toHaveLength(1);
+    expect(result.current.todos[0].id).toBe(id2);
+  });
+
+  it('T1-23: bulkMoveTodos moves multiple todos to a quadrant', () => {
+    const { result } = renderHook(() => useAppData());
+    let id1, id2;
+    act(() => { id1 = result.current.addTodo('a', 'ui').id; });
+    act(() => { id2 = result.current.addTodo('b', 'ni').id; });
+    act(() => { result.current.bulkMoveTodos([id1, id2], 'un'); });
+    expect(result.current.todos.every((t) => t.quad === 'un')).toBe(true);
+  });
+
+  it('T1-24: deleteTodo removes the todo by id', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addTodo('delete me').id; });
+    act(() => { result.current.deleteTodo(id); });
+    expect(result.current.todos.find((t) => t.id === id)).toBeUndefined();
+  });
+});
+
+describe('useAppData — lists CRUD', () => {
+  it('T1-25: addItem adds an item to the list', () => {
+    const { result } = renderHook(() => useAppData());
+    let listId;
+    act(() => { listId = result.current.addList('Test List').id; });
+    act(() => { result.current.addItem(listId, 'Item 1'); });
+    const list = result.current.lists.find((l) => l.id === listId);
+    expect(list.items).toHaveLength(1);
+    expect(list.items[0].text).toBe('Item 1');
+  });
+
+  it('T1-26: toggleItem flips item done state', () => {
+    const { result } = renderHook(() => useAppData());
+    let listId;
+    act(() => { listId = result.current.addList('Test').id; });
+    act(() => { result.current.addItem(listId, 'Item'); });
+    const itemId = result.current.lists.find((l) => l.id === listId).items[0].id;
+    act(() => { result.current.toggleItem(listId, itemId); });
+    expect(result.current.lists.find((l) => l.id === listId).items[0].done).toBe(true);
+  });
+
+  it('T1-27: deleteItem removes item from list', () => {
+    const { result } = renderHook(() => useAppData());
+    let listId;
+    act(() => { listId = result.current.addList('Test').id; });
+    act(() => { result.current.addItem(listId, 'Item'); });
+    const itemId = result.current.lists.find((l) => l.id === listId).items[0].id;
+    act(() => { result.current.deleteItem(listId, itemId); });
+    expect(result.current.lists.find((l) => l.id === listId).items).toHaveLength(0);
+  });
+
+  it('T1-28: bulkDeleteItems removes multiple items', () => {
+    const { result } = renderHook(() => useAppData());
+    let listId;
+    act(() => { listId = result.current.addList('Test').id; });
+    act(() => { result.current.addItem(listId, 'A'); });
+    act(() => { result.current.addItem(listId, 'B'); });
+    act(() => { result.current.addItem(listId, 'C'); });
+    const items = result.current.lists.find((l) => l.id === listId).items;
+    act(() => { result.current.bulkDeleteItems(listId, [items[0].id, items[2].id]); });
+    const remaining = result.current.lists.find((l) => l.id === listId).items;
+    expect(remaining).toHaveLength(1);
+    expect(remaining[0].text).toBe('B');
+  });
+});
+
 describe('useAppData — focus queue', () => {
   it('T1-13: addToFocus adds a task id to the focus queue', () => {
     const { result } = renderHook(() => useAppData());

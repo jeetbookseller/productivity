@@ -26,7 +26,7 @@ export function LinkPicker({ open, lists = [], currentListId, onSelect, onClose 
       <div className="absolute inset-0 bg-bark/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-white w-full md:max-w-sm rounded-t-2xl md:rounded-2xl
+      <div className="relative bg-surface w-full md:max-w-sm rounded-t-2xl md:rounded-2xl
         shadow-xl max-h-[70vh] flex flex-col anim-in">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-sand">

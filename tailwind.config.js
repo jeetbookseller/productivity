@@ -1,20 +1,21 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
-  darkMode: 'class',
+  darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     extend: {
       fontFamily: {
         sans: ['Nunito', 'sans-serif'],
       },
       colors: {
-        sage: '#7CB69D',
-        terracotta: '#E07A5F',
-        ocean: '#5A9BBF',
-        lavender: '#9B8AA6',
-        sand: '#E8DFD0',
-        cream: '#F7F5F0',
-        bark: '#3D352D',
+        sage: 'rgb(var(--sage) / <alpha-value>)',
+        terracotta: 'rgb(var(--terracotta) / <alpha-value>)',
+        ocean: 'rgb(var(--ocean) / <alpha-value>)',
+        lavender: 'rgb(var(--lavender) / <alpha-value>)',
+        sand: 'rgb(var(--sand) / <alpha-value>)',
+        cream: 'rgb(var(--cream) / <alpha-value>)',
+        bark: 'rgb(var(--bark) / <alpha-value>)',
+        surface: 'rgb(var(--surface) / <alpha-value>)',
       },
     },
   },

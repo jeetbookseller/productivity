@@ -185,6 +185,7 @@ export function Clarify() {
         title="Clarify"
         bulkMode={bulkMode}
         allSelected={allTodosCount > 0 && selected.size === allTodosCount}
+        someSelected={selected.size > 0 && selected.size < allTodosCount}
         onToggleBulk={toggleBulk}
         onSelectAll={selectAll}
       />
@@ -232,7 +233,7 @@ export function Clarify() {
       {bulkQuadMove && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
           <div className="absolute inset-0 bg-bark/50" onClick={() => setBulkQuadMove(false)} />
-          <div className="relative bg-white w-full md:max-w-sm rounded-t-2xl md:rounded-2xl shadow-xl p-5 anim-in">
+          <div className="relative bg-surface w-full md:max-w-sm rounded-t-2xl md:rounded-2xl shadow-xl p-5 anim-in">
             <h3 className="text-base font-bold text-bark mb-4">Move to Quadrant</h3>
             {QUAD_ORDER.map((qKey) => (
               <button
@@ -258,7 +259,7 @@ export function Clarify() {
       {moveOpen && movingTodo && (
         <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
           <div className="absolute inset-0 bg-bark/50" onClick={() => setMoveOpen(false)} />
-          <div className="relative bg-white w-full md:max-w-sm rounded-t-2xl md:rounded-2xl shadow-xl p-5 anim-in">
+          <div className="relative bg-surface w-full md:max-w-sm rounded-t-2xl md:rounded-2xl shadow-xl p-5 anim-in">
             <h3 className="text-base font-bold text-bark mb-4">Move to Quadrant</h3>
             {QUAD_ORDER.map((qKey) => (
               <button
@@ -340,7 +341,7 @@ function QuadrantPanel({
             <h3 className="text-sm font-bold text-bark">{quad.label}</h3>
             <p className="text-xs text-bark/50 font-semibold">{quad.sub}</p>
           </div>
-          <span className="text-xs font-bold text-bark/40 bg-white/60 px-2 py-0.5 rounded-full">
+          <span className="text-xs font-bold text-bark/40 bg-surface/60 px-2 py-0.5 rounded-full">
             {todos.filter((t) => !t.done).length}
           </span>
         </div>
@@ -394,7 +395,7 @@ function TodoRow({
 
   return (
     <li
-      className={`flex items-start gap-2 p-3 rounded-xl bg-white/80 border border-white/60
+      className={`flex items-start gap-2 p-3 rounded-xl bg-surface/80 border border-surface/60
         shadow-sm cursor-pointer transition-all
         ${todo.done ? 'opacity-50' : ''}
         ${selected ? 'ring-2 ring-sage/50' : ''}

@@ -11,6 +11,7 @@ export function StickyHeader({
   title,
   bulkMode = false,
   allSelected = false,
+  someSelected = false,
   onToggleBulk,
   onSelectAll,
   actions,
@@ -23,6 +24,12 @@ export function StickyHeader({
     }
   };
 
+  const checkboxIcon = bulkMode && allSelected
+    ? <I.CheckboxChecked width={20} height={20} />
+    : bulkMode && someSelected
+      ? <I.CheckboxMinus width={20} height={20} />
+      : <I.Checkbox width={20} height={20} />;
+
   return (
     <div className="sticky top-0 z-10 flex items-center gap-3 px-4 py-3
       bg-cream border-b border-sand/70">
@@ -33,10 +40,7 @@ export function StickyHeader({
           ${bulkMode ? 'text-sage' : 'text-bark/30 hover:text-bark/60'}`}
         aria-label={bulkMode ? (allSelected ? 'Deselect all' : 'Select all') : 'Enter bulk select'}
       >
-        {bulkMode && allSelected
-          ? <I.CheckboxChecked width={20} height={20} />
-          : <I.Checkbox width={20} height={20} />
-        }
+        {checkboxIcon}
       </button>
 
       {/* Title */}

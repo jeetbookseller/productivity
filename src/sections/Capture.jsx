@@ -174,6 +174,7 @@ export function Capture() {
         title="Capture"
         bulkMode={bulkMode}
         allSelected={notes.length > 0 && selected.size === notes.length}
+        someSelected={selected.size > 0 && selected.size < notes.length}
         onToggleBulk={toggleBulk}
         onSelectAll={selectAll}
       />
@@ -205,6 +206,7 @@ export function Capture() {
                 onSaveEdit={saveEdit}
                 onCancelEdit={cancelEdit}
                 onOpenMenu={openMenu}
+                onToggleSelect={toggleSelect}
               />
             ))}
           </ul>
@@ -255,6 +257,7 @@ function NoteRow({
   bulkMode, selected, isDesk,
   onPointerDown, onPointerUp,
   onEditTextChange, onSaveEdit, onCancelEdit, onOpenMenu,
+  onToggleSelect,
 }) {
   const handleDotsClick = (e) => {
     e.stopPropagation();
@@ -277,7 +280,7 @@ function NoteRow({
       className={`relative flex items-start gap-2 p-3 rounded-xl border transition-colors
         ${note.struck
           ? 'bg-cream border-sand/40 opacity-60'
-          : 'bg-white border-sand hover:border-sage/30'}
+          : 'bg-surface border-sand hover:border-sage/30'}
         ${selected ? 'ring-2 ring-sage/50 border-sage/40' : ''}
       `}
       onContextMenu={handleContextMenu}
@@ -287,7 +290,7 @@ function NoteRow({
         <button
           className={`flex-shrink-0 mt-0.5 ${selected ? 'text-sage' : 'text-bark/30'}`}
           aria-label={selected ? 'Deselect' : 'Select'}
-          onClick={(e) => { e.stopPropagation(); onPointerUp(e, note); }}
+          onClick={(e) => { e.stopPropagation(); onToggleSelect(note.id); }}
         >
           {selected
             ? <I.CheckboxChecked width={18} height={18} />
