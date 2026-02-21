@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background: sage green fills entire canvas for maskable icon -->
+  <rect width="512" height="512" rx="96" fill="#7CB69D"/>
+  <!-- Decorative ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="#F7F5F0" stroke-width="14" opacity="0.5"/>
+  <!-- Letterform P — vertical stem -->
+  <rect x="176" y="160" width="24" height="192" rx="12" fill="#F7F5F0"/>
+  <!-- P — top bar -->
+  <rect x="176" y="160" width="120" height="24" rx="12" fill="#F7F5F0"/>
+  <!-- P — middle bar -->
+  <rect x="176" y="232" width="120" height="24" rx="12" fill="#F7F5F0"/>
+  <!-- P — right bowl -->
+  <rect x="272" y="160" width="24" height="96" rx="12" fill="#F7F5F0"/>
+  <!-- Accent: terracotta dot -->
+  <circle cx="336" cy="320" r="28" fill="#E07A5F"/>
+  <circle cx="336" cy="320" r="14" fill="#F7F5F0"/>
+</svg>

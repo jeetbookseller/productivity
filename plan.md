@@ -433,7 +433,7 @@ Gate: Round-trip test passes. Manual: generate code on device A → paste on dev
  
 ---
  
-### Phase 8 — PWA + Final Build
+### Phase 8 — PWA + Final Build ✅ COMPLETE (108/108 tests)
 **Deliverable:** PWA install, offline, and service worker work with the Vite build output.
  
 Tests first:
