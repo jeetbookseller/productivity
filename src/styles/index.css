@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS custom properties — color palette */
+:root {
+  --sage: #7CB69D;
+  --terracotta: #E07A5F;
+  --ocean: #5A9BBF;
+  --lavender: #9B8AA6;
+  --sand: #E8DFD0;
+  --cream: #F7F5F0;
+  --bark: #3D352D;
+}
+
+/* Base font */
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--cream);
+  color: var(--bark);
+}
+
+/* Animations */
+@keyframes animIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes animOut {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(8px); }
+}
+
+.anim-in  { animation: animIn  0.2s ease both; }
+.anim-out { animation: animOut 0.2s ease both; }
