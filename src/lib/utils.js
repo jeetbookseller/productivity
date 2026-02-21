@@ -144,3 +144,21 @@ export const CATS = {
   health:   { key: 'health',   label: 'Health',   emoji: '💪' },
   learning: { key: 'learning', label: 'Learning', emoji: '📚' },
 };
+
+// ── Sync code (cross-device data transfer) ─────────────────────────────────────
+
+export function encodeSync(data) {
+  return btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+}
+
+export function decodeSync(code) {
+  try {
+    if (!code) return null;
+    const json = decodeURIComponent(escape(atob(code)));
+    const obj = JSON.parse(json);
+    if (typeof obj !== 'object' || obj === null) return null;
+    return obj;
+  } catch {
+    return null;
+  }
+}

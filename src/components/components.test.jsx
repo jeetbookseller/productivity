@@ -8,6 +8,7 @@ import { ContextMenu } from './ContextMenu.jsx';
 import { EditModal } from './EditModal.jsx';
 import { ConfirmDialog } from './ConfirmDialog.jsx';
 import { BulkActionBar } from './BulkActionBar.jsx';
+import { QRCanvas } from './QRCanvas.jsx';
 
 // ── ContextMenu ───────────────────────────────────────────────────────────────
 
@@ -119,6 +120,15 @@ describe('ConfirmDialog', () => {
     );
     fireEvent.click(screen.getByText('Cancel'));
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ── QRCanvas ──────────────────────────────────────────────────────────────────
+
+describe('QRCanvas', () => {
+  it('T7-2: QRCanvas renders a canvas element without throwing', () => {
+    const { container } = render(<QRCanvas data="hello-sync" size={128} />);
+    expect(container.querySelector('canvas')).toBeTruthy();
   });
 });
 

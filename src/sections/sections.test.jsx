@@ -438,4 +438,11 @@ describe('Settings', () => {
     const darkBtn = screen.getByLabelText('Theme: Dark');
     expect(darkBtn.className).toMatch(/sage/);
   });
+
+  it('T7-3: Share Data card renders with Copy sync code button', () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.assign(navigator, { clipboard: { writeText } });
+    wrap(<Settings />, mkCtx());
+    expect(screen.getByLabelText('Copy sync code')).toBeTruthy();
+  });
 });
