@@ -278,8 +278,10 @@ Test keys: `__TEST__*` (auto-cleaned by test runner)
  
 ---
  
-### Phase 1 — Project Scaffold + Storage Layer
+### Phase 1 — Project Scaffold + Storage Layer ✅ COMPLETE
 **Deliverable:** Vite boots; storage API works identically to `app_core.js`.
+**Completed:** 2026-02-21 | **Branch:** `claude/read-plan-md-rlJLI`
+**Test results:** T0 12/12 · **Total 12/12**
  
 Tests first:
 - T0 storage contract tests: `S.get`, `S.set`, `S.exp`, `S.imp`, `S.clr`
@@ -296,8 +298,10 @@ Gate: T0 storage tests 11/11. `npm run dev` serves blank page, no console errors
  
 ---
  
-### Phase 2 — Hooks Migration
+### Phase 2 — Hooks Migration ✅ COMPLETE
 **Deliverable:** `usePersistedState` and `useAppData` work as standalone ES modules.
+**Completed:** 2026-02-21 | **Branch:** `claude/phase-2-hooks-migration-rlJLI`
+**Test results:** T0 12/12 · T1 15/15 · **Total 27/27**
  
 Tests first:
 - `usePersistedState`: debounce timing, sync reads, async reconciliation
@@ -313,8 +317,10 @@ Gate: T0 + T1 hook contract tests pass (26/26).
  
 ---
  
-### Phase 3 — Shared UI Components
+### Phase 3 — Shared UI Components ✅ COMPLETE
 **Deliverable:** All shared components mount and behave correctly in isolation.
+**Completed:** 2026-02-21 | **Branch:** `claude/review-phase-3-changes-hwzQk`
+**Test results:** T0 12/12 · T1 15/15 · T2 11/11 · **Total 38/38**
  
 Tests first:
 - ContextMenu: opens, closes, fires correct callback on item click
@@ -372,8 +378,10 @@ Each sub-phase: adapt relevant T1/T2 tests → migrate section → verify.
  
 ---
  
-### Phase 5 — App Shell + Full Integration
+### Phase 5 — App Shell + Full Integration ✅ COMPLETE
 **Deliverable:** All sections wired together; navigation and global state work end-to-end.
+**Completed:** 2026-02-21 | **Branch:** `claude/implement-phase-5-tdd-k4ANs`
+**Test results:** T0 12/12 · T1 15/15 · T2 19/19 · Sections 47/47 · **Total 93/93**
  
 Tests first:
 - T2 crossover: tab switch preserves timer state, linked task opens checklist, focus queue pulls from Clarify
@@ -388,8 +396,10 @@ Gate: Full 45-test suite passes — T0 (11/11), T1 (15/15), T2 (≥17/19). `npm 
  
 ---
  
-### Phase 6 — Design Cleanup
+### Phase 6 — Design Cleanup ✅ COMPLETE
 **Deliverable:** Cleaner flat UI; zero behavior changes; all tests still pass.
+**Completed:** 2026-02-21 | **Branch:** `claude/tdd-workflow-phase-6-a0zgX`
+**Test results:** T0 12/12 · T1 15/15 · T2 19/19 · Sections 47/47 · Design 6/6 · **Total 99/99**
  
 Tests first:
 - Assert no component uses `.glass` or `.gcard` class names
@@ -404,8 +414,10 @@ Gate: Full 45-test suite still passes. Manual visual check: mobile + desktop + l
  
 ---
  
-### Phase 7 — Cross-Device Sync
+### Phase 7 — Cross-Device Sync ✅ COMPLETE
 **Deliverable:** Users can move data between devices with no backend.
+**Completed:** 2026-02-21 | **Branch:** `claude/implement-phase-7-tdd-BbYCj`
+**Test results:** T0 14/14 · T1 15/15 · T2 12/12 · Sections 48/48 · Design 6/6 · App 8/8 · **Total 103/103**
  
 Tests first:
 - Round-trip: `encodeSync(data)` → `decodeSync(code)` → deep-equal to original
