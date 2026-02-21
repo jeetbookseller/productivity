@@ -1,0 +1,15 @@
+{
+  "name": "Productivity Hub",
+  "short_name": "Productivity",
+  "description": "Your personal productivity system — capture, clarify, focus, confirm, review.",
+  "theme_color": "#7CB69D",
+  "background_color": "#FAFAF8",
+  "display": "standalone",
+  "start_url": "/productivity/",
+  "scope": "/productivity/",
+  "icons": [
+    { "src": "/productivity/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/productivity/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/productivity/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
