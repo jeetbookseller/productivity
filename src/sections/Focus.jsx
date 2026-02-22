@@ -55,6 +55,9 @@ export function Focus() {
           if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
           recordPom(getDuration(prev.mode) / 60);
         }
+        if (left === 0) {
+          return { ...prev, left: 0, run: false, endAt: null };
+        }
         return { ...prev, left };
       });
     };
@@ -224,7 +227,7 @@ export function Focus() {
       </div>
 
       {/* Focus Queue */}
-      <div className={`flex flex-col border-sand ${isDesk ? 'md:w-80 md:border-l' : 'border-t'}`}>
+      <div className={`flex flex-col border-sand ${isDesk ? 'md:flex-1 md:border-l' : 'border-t'}`}>
         <div className="px-4 py-3 border-b border-sand/70 flex items-center justify-between">
           <h3 className="text-sm font-bold text-bark flex items-center gap-2">
             <I.Zap width={15} height={15} className="text-ocean" />
