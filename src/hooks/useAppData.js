@@ -59,6 +59,8 @@ export function useAppData() {
   // Refs for reading current state inside callbacks without stale closures
   const notesRef = useRef(notes);
   useEffect(() => { notesRef.current = notes; }, [notes]);
+  const todosRef = useRef(todos);
+  useEffect(() => { todosRef.current = todos; }, [todos]);
 
   // ── Notes (Capture) ──────────────────────────────────────────────────────────
 
@@ -127,7 +129,9 @@ export function useAppData() {
   };
 
   const toggleTodo = (id) => {
+    const wasDone = todosRef.current.find((t) => t.id === id)?.done;
     setTodos((prev) => prev.map((t) => t.id === id ? { ...t, done: !t.done } : t));
+    if (wasDone === false) recordTaskDone();
   };
 
   const moveTodo = (id, quad) => {
@@ -277,6 +281,13 @@ export function useAppData() {
       const d = { ...prevD, p: prevD.p + 1, m: prevD.m + minutes };
       return { d, w: { ...m.w, p: m.w.p + 1, m: m.w.m + minutes } };
     });
+    setDHist((prev) => {
+      const idx = prev.findIndex((d) => d.date === today);
+      if (idx === -1) return [{ date: today, p: 1, t: 0, m: minutes }, ...prev];
+      return prev.map((d, i) => (
+        i === idx ? { ...d, p: (d.p || 0) + 1, m: (d.m || 0) + minutes } : d
+      ));
+    });
   };
 
   const recordTaskDone = () => {
@@ -285,6 +296,13 @@ export function useAppData() {
       const prevD = m.d.date === today ? m.d : { p: m.d.p, t: 0, m: m.d.m, date: today };
       const d = { ...prevD, t: prevD.t + 1 };
       return { d, w: { ...m.w, t: m.w.t + 1 } };
+    });
+    setDHist((prev) => {
+      const idx = prev.findIndex((d) => d.date === today);
+      if (idx === -1) return [{ date: today, p: 0, t: 1, m: 0 }, ...prev];
+      return prev.map((d, i) => (
+        i === idx ? { ...d, t: (d.t || 0) + 1 } : d
+      ));
     });
   };
 

@@ -121,6 +121,15 @@ describe('useAppData — todos (Clarify)', () => {
     act(() => { result.current.toggleTodo(id); });
     expect(result.current.todos.find((t) => t.id === id).done).toBe(false);
   });
+
+  it('T1-11b: toggling undone todo to done increments weekly task metric', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addTodo('metric task').id; });
+    const before = result.current.met.w.t;
+    act(() => { result.current.toggleTodo(id); });
+    expect(result.current.met.w.t).toBe(before + 1);
+  });
 });
 
 describe('useAppData — lists (Confirm)', () => {
@@ -283,6 +292,27 @@ describe('useAppData — focus queue', () => {
     act(() => { result.current.addToFocus(id); });
     act(() => { result.current.removeFromFocus(id); });
     expect(result.current.focus).not.toContain(id);
+  });
+});
+
+describe('useAppData — review history', () => {
+  it('T1-29: recordPom writes/updates today in dHist', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    act(() => { result.current.recordPom(25); });
+    const day = result.current.dHist.find((d) => d.date === today);
+    expect(day).toBeTruthy();
+    expect(day.p).toBeGreaterThanOrEqual(1);
+    expect(day.m).toBeGreaterThanOrEqual(25);
+  });
+
+  it('T1-30: recordTaskDone writes/updates today task count in dHist', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    act(() => { result.current.recordTaskDone(); });
+    const day = result.current.dHist.find((d) => d.date === today);
+    expect(day).toBeTruthy();
+    expect(day.t).toBeGreaterThanOrEqual(1);
   });
 });
 

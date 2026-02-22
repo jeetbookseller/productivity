@@ -55,7 +55,13 @@ export function Focus() {
           if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
           recordPom(getDuration(prev.mode) / 60);
         }
-        return { ...prev, left };
+        return {
+          ...prev,
+          left,
+          run: left > 0,
+          endAt: left > 0 ? prev.endAt : null,
+          startAt: left > 0 ? prev.startAt : null,
+        };
       });
     };
 
