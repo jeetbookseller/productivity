@@ -1,7 +1,7 @@
 /**
  * ConfirmDialog — confirm / info dialog with optional danger variant
  */
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function ConfirmDialog({
   open,
@@ -12,6 +12,22 @@ export function ConfirmDialog({
   onConfirm,
   onClose,
 }) {
+  const [phase, setPhase] = useState('closed'); // 'open' | 'closing' | 'closed'
+
+  useEffect(() => {
+    if (open) {
+      setPhase('open');
+    } else {
+      setPhase((prev) => (prev === 'open' ? 'closing' : prev));
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (phase !== 'closing') return;
+    const t = setTimeout(() => setPhase('closed'), 200);
+    return () => clearTimeout(t);
+  }, [phase]);
+
   useEffect(() => {
     if (!open) return;
     const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -19,7 +35,9 @@ export function ConfirmDialog({
     return () => document.removeEventListener('keydown', handleKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (phase === 'closed') return null;
+
+  const animClass = phase === 'closing' ? 'anim-out' : 'anim-in';
 
   const handleConfirm = () => {
     onConfirm();
@@ -32,7 +50,7 @@ export function ConfirmDialog({
       <div className="absolute inset-0 bg-bark/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-surface rounded-2xl shadow-xl w-full max-w-sm p-5 anim-in">
+      <div className={`relative bg-surface rounded-2xl shadow-xl w-full max-w-sm p-5 ${animClass}`}>
         <p className="text-sm font-semibold text-bark mb-5 leading-relaxed">{message}</p>
 
         <div className="flex gap-2 justify-end">

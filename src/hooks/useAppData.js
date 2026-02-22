@@ -127,6 +127,10 @@ export function useAppData() {
   };
 
   const toggleTodo = (id) => {
+    const todo = todos.find(t => t.id === id);
+    if (todo && !todo.done) {
+      recordTaskDone();
+    }
     setTodos((prev) => prev.map((t) => t.id === id ? { ...t, done: !t.done } : t));
   };
 
@@ -276,6 +280,15 @@ export function useAppData() {
       const prevD = m.d.date === today ? m.d : { p: 0, t: m.d.t, m: 0, date: today };
       const d = { ...prevD, p: prevD.p + 1, m: prevD.m + minutes };
       return { d, w: { ...m.w, p: m.w.p + 1, m: m.w.m + minutes } };
+    });
+    setDHist((prev) => {
+      const idx = prev.findIndex(e => e.date === today);
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], p: next[idx].p + 1 };
+        return next;
+      }
+      return [...prev, { date: today, p: 1 }];
     });
   };
 

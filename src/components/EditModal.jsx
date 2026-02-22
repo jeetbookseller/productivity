@@ -15,6 +15,21 @@ export function EditModal({
 }) {
   const [text, setText] = useState(value);
   const inputRef = useRef(null);
+  const [phase, setPhase] = useState('closed'); // 'open' | 'closing' | 'closed'
+
+  useEffect(() => {
+    if (open) {
+      setPhase('open');
+    } else {
+      setPhase((prev) => (prev === 'open' ? 'closing' : prev));
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (phase !== 'closing') return;
+    const t = setTimeout(() => setPhase('closed'), 200);
+    return () => clearTimeout(t);
+  }, [phase]);
 
   // Re-sync when `value` prop changes (new item opened)
   useEffect(() => { setText(value); }, [value, open]);
@@ -32,7 +47,9 @@ export function EditModal({
     return () => document.removeEventListener('keydown', handleKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (phase === 'closed') return null;
+
+  const animClass = phase === 'closing' ? 'anim-out' : 'anim-in';
 
   const handleSave = () => {
     onSave(text);
@@ -52,7 +69,7 @@ export function EditModal({
       <div className="absolute inset-0 bg-bark/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-surface rounded-2xl shadow-xl w-full max-w-md p-5 anim-in">
+      <div className={`relative bg-surface rounded-2xl shadow-xl w-full max-w-md p-5 ${animClass}`}>
         {title && (
           <h3 className="text-base font-bold text-bark mb-3">{title}</h3>
         )}

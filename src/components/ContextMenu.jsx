@@ -3,9 +3,25 @@
  * Desktop: positioned panel near anchor point
  * Mobile: fixed bottom-sheet
  */
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export function ContextMenu({ open, items = [], onClose, anchorRect, isDesktop }) {
+  const [phase, setPhase] = useState('closed'); // 'open' | 'closing' | 'closed'
+
+  useEffect(() => {
+    if (open) {
+      setPhase('open');
+    } else {
+      setPhase((prev) => (prev === 'open' ? 'closing' : prev));
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (phase !== 'closing') return;
+    const t = setTimeout(() => setPhase('closed'), 200);
+    return () => clearTimeout(t);
+  }, [phase]);
+
   useEffect(() => {
     if (!open) return;
     const handleKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -13,7 +29,9 @@ export function ContextMenu({ open, items = [], onClose, anchorRect, isDesktop }
     return () => document.removeEventListener('keydown', handleKey);
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (phase === 'closed') return null;
+
+  const animClass = phase === 'closing' ? 'anim-out' : 'anim-in';
 
   // Desktop: position near anchor; clamp to viewport
   let panelStyle = {};
@@ -36,7 +54,7 @@ export function ContextMenu({ open, items = [], onClose, anchorRect, isDesktop }
       {isDesktop && anchorRect ? (
         // Desktop: positioned panel
         <div
-          className="z-50 bg-surface border border-sand rounded-xl shadow-lg py-1 min-w-[160px] anim-in"
+          className={`z-50 bg-surface border border-sand rounded-xl shadow-lg py-1 min-w-[160px] ${animClass}`}
           style={panelStyle}
         >
           {items.map((item, idx) => (
@@ -53,7 +71,7 @@ export function ContextMenu({ open, items = [], onClose, anchorRect, isDesktop }
         </div>
       ) : (
         // Mobile: bottom sheet
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-2xl shadow-lg anim-in pb-safe">
+        <div className={`fixed bottom-0 left-0 right-0 z-50 bg-surface rounded-t-2xl shadow-lg pb-safe ${animClass}`}>
           <div className="w-10 h-1 bg-sand rounded-full mx-auto mt-3 mb-2" />
           {items.map((item, idx) => (
             <button
