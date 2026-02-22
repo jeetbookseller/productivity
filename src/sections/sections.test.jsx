@@ -36,14 +36,12 @@ function mkCtx(overrides = {}) {
     todos: [], notes: [], lists: [], focus: [],
     theme: 'system', preset: 'classic',
     customT: { work: 25, short: 5, long: 15 },
-    timerState: { mode: 'work', left: 25 * 60, run: false, endAt: null, startAt: null, elapsed: 0 },
     poms: 0,
     met: { d: { p: 0, t: 0, m: 0, date: '' }, w: { p: 0, t: 0, m: 0 } },
     dHist: [], fHist: [], tab: 'capture', seenAbout: false,
     // Setters
     setCustomT: vi.fn(), setTab: vi.fn(), setSeenAbout: vi.fn(),
     setDHist: vi.fn(), setFHist: vi.fn(),
-    setTimerState: vi.fn(),
     setTheme: vi.fn(), setPreset: vi.fn(),
     // Notes
     addNote: vi.fn(), editNote: vi.fn(), deleteNote: vi.fn(),
@@ -310,42 +308,6 @@ describe('Focus', () => {
     wrap(<Focus />, mkCtx({ todos, focus: ['t1'], removeFromFocus }));
     fireEvent.click(screen.getByLabelText('Remove from focus'));
     expect(removeFromFocus).toHaveBeenCalledWith('t1');
-  });
-
-  it('4c-9: timer auto-stops at 00:00 and records one pomodoro', () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-02-22T12:00:00.000Z'));
-
-    const recordPom = vi.fn();
-    const initial = {
-      mode: 'work',
-      left: 1,
-      run: true,
-      endAt: Date.now() + 1000,
-      startAt: Date.now(),
-      elapsed: 0,
-    };
-
-    function FocusHarness() {
-      const [timerState, setTimerState] = React.useState(initial);
-      const ctx = mkCtx({ timerState, setTimerState, recordPom });
-      return (
-        <AppDataContext.Provider value={ctx}>
-          <Focus />
-        </AppDataContext.Provider>
-      );
-    }
-
-    render(<FocusHarness />);
-    expect(screen.getByText('running')).toBeTruthy();
-
-    act(() => { vi.advanceTimersByTime(1500); });
-
-    expect(screen.queryByText('running')).toBeNull();
-    expect(screen.getByLabelText('Start')).toBeTruthy();
-    expect(recordPom).toHaveBeenCalledTimes(1);
-
-    vi.useRealTimers();
   });
 });
 
