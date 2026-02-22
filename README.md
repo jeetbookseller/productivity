@@ -36,6 +36,22 @@ A personal productivity web app combining multiple proven methodologies into one
 
 ---
 
+## Technical overview
+
+Productivity Hub is a **static single-page application** with no server component. The entire app ships as pre-built HTML/CSS/JS to GitHub Pages and runs entirely in the browser.
+
+**Architecture.** State is managed centrally in a single React context (`useAppData`) and flows down to six section components. A custom `usePersistedState` hook provides dual-layer persistence: writes go to `localStorage` immediately (so reads on next paint are synchronous) and to IndexedDB on a 300 ms debounce (the source of truth for larger payloads). On mount, the hook reconciles any IndexedDB value over the initial localStorage read.
+
+**Offline / PWA.** A cache-first service worker pre-caches the app shell on install and serves all assets offline. The Web Manifest enables home-screen installation on iOS and Android. The Pomodoro timer state is persisted to storage so a session survives tab closes and page reloads.
+
+**No-backend sync.** Cross-device data transfer is done entirely client-side: the full app state is JSON-serialised, base64-encoded, and either copied to the clipboard or rendered as a QR code (drawn on a `<canvas>` without any library) for the receiving device to scan and import.
+
+**Rendering & styling.** Components are plain React functional components with hooks — no Redux, no router, no component library. Layout uses Tailwind utility classes with CSS custom properties for the theme colour palette. Dark mode is toggled by setting `data-theme="dark"` on `<html>`, which flips the CSS variable values.
+
+**Testing.** The 45-test suite (Vitest + Testing Library) is bundled into the production build and lazy-loaded in the Settings tab so it can be run directly in the browser against the live app, with no separate test environment needed.
+
+---
+
 ## Tech stack
 
 | Layer | Technology |
