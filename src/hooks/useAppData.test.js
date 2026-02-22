@@ -267,6 +267,60 @@ describe('useAppData — lists CRUD', () => {
   });
 });
 
+describe('useAppData — metrics (Review)', () => {
+  it('T1-29: recordPom increments poms, met.d.p, met.d.m, and met.w', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    act(() => { result.current.recordPom(25); });
+    expect(result.current.poms).toBe(1);
+    expect(result.current.met.d.p).toBe(1);
+    expect(result.current.met.d.m).toBe(25);
+    expect(result.current.met.d.date).toBe(today);
+    expect(result.current.met.w.p).toBe(1);
+    expect(result.current.met.w.m).toBe(25);
+  });
+
+  it('T1-30: recordPom creates a new dHist entry for today', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    act(() => { result.current.recordPom(25); });
+    const entry = result.current.dHist.find((e) => e.date === today);
+    expect(entry).toBeDefined();
+    expect(entry.p).toBe(1);
+  });
+
+  it('T1-31: recordPom increments existing dHist entry when called again same day', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    act(() => { result.current.recordPom(25); });
+    act(() => { result.current.recordPom(25); });
+    const entries = result.current.dHist.filter((e) => e.date === today);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].p).toBe(2);
+  });
+
+  it('T1-32: toggleTodo increments met task counts when completing a todo', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    let id;
+    act(() => { id = result.current.addTodo('task to complete').id; });
+    act(() => { result.current.toggleTodo(id); }); // false → true
+    expect(result.current.met.d.t).toBe(1);
+    expect(result.current.met.d.date).toBe(today);
+    expect(result.current.met.w.t).toBe(1);
+  });
+
+  it('T1-33: toggleTodo does NOT increment met when un-completing a todo', () => {
+    const { result } = renderHook(() => useAppData());
+    let id;
+    act(() => { id = result.current.addTodo('task to uncomplete').id; });
+    act(() => { result.current.toggleTodo(id); }); // false → true  (counts once)
+    act(() => { result.current.toggleTodo(id); }); // true  → false (should NOT count again)
+    expect(result.current.met.d.t).toBe(1); // still 1
+    expect(result.current.met.w.t).toBe(1);
+  });
+});
+
 describe('useAppData — focus queue', () => {
   it('T1-13: addToFocus adds a task id to the focus queue', () => {
     const { result } = renderHook(() => useAppData());

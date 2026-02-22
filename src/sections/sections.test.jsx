@@ -60,6 +60,9 @@ function mkCtx(overrides = {}) {
     toggleItem: vi.fn(), bulkDeleteItems: vi.fn(),
     // Metrics
     recordPom: vi.fn(), recordTaskDone: vi.fn(),
+    // Timer
+    timerState: { mode: 'work', left: 25 * 60, run: false, endAt: null, startAt: null, elapsed: 0 },
+    setTimerState: vi.fn(),
     ...overrides,
   };
 }
@@ -309,6 +312,31 @@ describe('Focus', () => {
     fireEvent.click(screen.getByLabelText('Remove from focus'));
     expect(removeFromFocus).toHaveBeenCalledWith('t1');
   });
+
+  it('4c-9: tick updater sets run:false and clears endAt when timer reaches zero', () => {
+    vi.useFakeTimers();
+    const setTimerState = vi.fn();
+    const timerState = {
+      mode: 'work', left: 1, run: true,
+      endAt: Date.now() - 2000, // already in the past → computeLeft returns 0
+      startAt: Date.now() - 3000, elapsed: 0,
+    };
+    wrap(<Focus />, mkCtx({ timerState, setTimerState }));
+
+    act(() => { vi.advanceTimersByTime(600); }); // one tick fires
+
+    // setTimerState is called with an updater function
+    const updaterCalls = setTimerState.mock.calls.filter((c) => typeof c[0] === 'function');
+    expect(updaterCalls.length).toBeGreaterThan(0);
+
+    // Invoke the updater with a left=0 state to verify the halt logic
+    const updater = updaterCalls[0][0];
+    const next = updater({ ...timerState, left: 0 });
+    expect(next.run).toBe(false);
+    expect(next.endAt).toBeNull();
+
+    vi.useRealTimers();
+  });
 });
 
 // ── 4d: Confirm ───────────────────────────────────────────────────────────────
@@ -491,11 +519,11 @@ describe('Settings', () => {
     expect(screen.getByLabelText('Run test suite')).toBeTruthy();
   });
 
-  it('4f-9: explainer section shows accordion items (mobile layout)', () => {
+  it('4f-9: explainer section shows workflow steps (How it works card)', () => {
     wrap(<Settings />, mkCtx());
-    expect(screen.getByText('Capture')).toBeTruthy();
-    expect(screen.getByText('Clarify')).toBeTruthy();
-    expect(screen.getByText('Focus')).toBeTruthy();
+    expect(screen.getByText(/1\. Capture/)).toBeTruthy();
+    expect(screen.getByText(/2\. Clarify/)).toBeTruthy();
+    expect(screen.getByText(/3\. Focus/)).toBeTruthy();
   });
 
   it('4f-10: active theme button has sage styling', () => {
@@ -511,12 +539,10 @@ describe('Settings', () => {
     expect(screen.getByLabelText('Copy sync code')).toBeTruthy();
   });
 
-  it('4f-11: Show Help button renders and opens AboutModal', () => {
+  it('4f-11: Methodologies section renders guide accordion items', () => {
     wrap(<Settings />, mkCtx());
-    const helpBtn = screen.getByLabelText('Show help');
-    expect(helpBtn).toBeTruthy();
-    fireEvent.click(helpBtn);
-    // AboutModal should be visible with version info
-    expect(screen.getByText('v18.0-Alpha')).toBeTruthy();
+    expect(screen.getByText('Methodologies')).toBeTruthy();
+    expect(screen.getByText('📓 Bullet Journal Method')).toBeTruthy();
+    expect(screen.getByText('🍅 Pomodoro Technique')).toBeTruthy();
   });
 });
