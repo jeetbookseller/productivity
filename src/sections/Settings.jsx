@@ -32,16 +32,6 @@ const PRESET_LIST = Object.entries(PRESETS)
 
 const GUIDE_SECTIONS = [
   {
-    key: 'workflow',
-    title: '🔄 The Workflow',
-    body: WorkflowSection,
-  },
-  {
-    key: 'daily',
-    title: '🚀 Daily Workflow',
-    body: DailyWorkflowSection,
-  },
-  {
     key: 'bujo',
     title: '📓 Bullet Journal Method',
     body: BulletJournalSection,
@@ -52,42 +42,22 @@ const GUIDE_SECTIONS = [
     body: GTDSection,
   },
   {
-    key: 'techniques',
-    title: '⚡ Techniques Reference',
-    body: TechniquesSection,
+    key: 'pomodoro',
+    title: '🍅 Pomodoro Technique',
+    body: PomodoroSection,
+  },
+  {
+    key: 'deepwork',
+    title: '🎯 Deep Work',
+    body: DeepWorkSection,
+  },
+  {
+    key: 'eisenhower',
+    title: '📊 Eisenhower Matrix',
+    body: EisenhowerSection,
   },
 ];
 
-const EXPLAINER_ITEMS = [
-  {
-    title: 'Capture',
-    body: 'Brain-dump anything instantly. Tap an item to edit inline. Use the 3-dot menu to promote to Clarify, strikethrough, copy, or delete.',
-  },
-  {
-    title: 'Clarify',
-    body: 'Sort tasks into the Eisenhower Matrix: Do First (urgent+important), Schedule (not urgent+important), Delegate, or Eliminate.',
-  },
-  {
-    title: 'Focus',
-    body: 'Select up to 5 tasks for your focus queue, then run Pomodoro sessions. Timer state persists across tab switches.',
-  },
-  {
-    title: 'Confirm',
-    body: 'Create checklists with named sections. Link checklists to Clarify tasks for step-by-step workflows.',
-  },
-  {
-    title: 'Review',
-    body: 'See your weekly metrics, 13-week activity heatmap, streak, task distribution, and personalised insights.',
-  },
-  {
-    title: 'Bulk Select',
-    body: 'Tap the checkbox in any section header to enter bulk-select mode. Select multiple items, then strike, move, or delete them at once.',
-  },
-  {
-    title: 'Data & Privacy',
-    body: 'All data lives entirely on your device — IndexedDB with localStorage fallback. Nothing is sent to any server.',
-  },
-];
 
 export function Settings() {
   const {
@@ -108,7 +78,7 @@ export function Settings() {
   const [confirmAct,  setConfirmAct]  = useState(null);
 
   // Accordion state
-  const [openAccordion, setOpenAccordion] = useState(null);
+  const [dailyWorkflowOpen, setDailyWorkflowOpen] = useState(false);
   const [openGuideSection, setOpenGuideSection] = useState(null);
 
   // Share Data state
@@ -403,24 +373,15 @@ export function Settings() {
         {/* ── How it works ──────────────────────────────────────────────── */}
         <div className={isDesk ? 'col-span-2' : ''}>
           <Card title="How it works">
-            <div className={isDesk ? 'grid grid-cols-2 gap-3' : 'space-y-1'}>
-              {EXPLAINER_ITEMS.map((item, idx) => (
-                isDesk ? (
-                  <div key={idx} className="bg-cream rounded-xl p-4 border border-sand/60">
-                    <p className="text-sm font-bold text-bark mb-1">{item.title}</p>
-                    <p className="text-xs font-semibold text-bark/60 leading-relaxed">{item.body}</p>
-                  </div>
-                ) : (
-                  <AccordionItem
-                    key={idx}
-                    title={item.title}
-                    body={item.body}
-                    open={openAccordion === idx}
-                    onToggle={() => setOpenAccordion(openAccordion === idx ? null : idx)}
-                  />
-                )
-              ))}
+            <div className="text-xs font-semibold text-bark/60 leading-relaxed mb-4">
+              <WorkflowSection />
             </div>
+            <AccordionItem
+              title="📅 Daily Workflow Example"
+              body={<DailyWorkflowSection />}
+              open={dailyWorkflowOpen}
+              onToggle={() => setDailyWorkflowOpen((v) => !v)}
+            />
           </Card>
         </div>
 
@@ -641,38 +602,125 @@ function GTDSection() {
   );
 }
 
-function TechniquesSection() {
+function PomodoroSection() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      <p>
+        The Pomodoro Technique, created by Francesco Cirillo, uses timed work intervals
+        separated by short breaks to build sustained focus and prevent burnout. By working
+        in discrete sprints you create a sense of urgency, reduce the temptation to
+        multitask, and make large projects feel manageable.
+      </p>
       <div>
-        <p className="font-bold text-bark mb-1">🍅 Pomodoro Technique</p>
+        <p className="font-bold text-bark/80 mb-1">The Cycle:</p>
+        <ol className="list-decimal list-inside space-y-0.5 pl-1">
+          <li>Work Session — 25 minutes of uninterrupted focus on one task</li>
+          <li>Short Break — 5 minutes to rest and reset</li>
+          <li>Repeat steps 1–2 four times</li>
+          <li>Long Break — 15–30 minutes after completing 4 cycles</li>
+        </ol>
+      </div>
+      <div>
+        <p className="font-bold text-bark/80 mb-1">Why it works:</p>
         <ul className="list-disc list-inside space-y-0.5 pl-1">
-          <li>Work Session: 25 minutes</li>
-          <li>Short Break: 5 minutes</li>
-          <li>Repeat 4 times</li>
-          <li>Long Break: 15 minutes after 4 cycles</li>
+          <li>Parkinson's Law — work expands to fill the time given; short sprints force efficiency</li>
+          <li>Regular breaks prevent cognitive fatigue and maintain quality</li>
+          <li>Counting pomodoros gives a concrete measure of effort, not just outcomes</li>
+          <li>The ritual of starting a timer creates a clear on/off switch for focus mode</li>
         </ul>
       </div>
       <div>
-        <p className="font-bold text-bark mb-1">🎯 Deep Work & Focus Queue</p>
-        <p className="mb-1">Focus Queue limits you to 3–5 tasks to maximize focus.</p>
+        <p className="font-bold text-bark/80 mb-1">In this app:</p>
         <ul className="list-disc list-inside space-y-0.5 pl-1">
-          <li>3 Tasks: For highly complex work, maximum focus</li>
-          <li>5 Tasks: For varied responsibilities, 8+ hour days</li>
+          <li>Use the Focus tab — select tasks, then start the timer</li>
+          <li>Presets: Classic (25/5/15), Short (15/3/10), Long (50/10/20)</li>
+          <li>Custom durations available in Settings → Timer</li>
+          <li>Completed pomodoros are tracked in Review for weekly insights</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function DeepWorkSection() {
+  return (
+    <div className="space-y-3">
+      <p>
+        Deep Work, coined by Cal Newport, is the practice of focusing without distraction
+        on a cognitively demanding task. It's the opposite of shallow work — email, quick
+        replies, admin — and is the activity that creates the most professional value and
+        builds skills that are hard to replicate.
+      </p>
+      <div>
+        <p className="font-bold text-bark/80 mb-1">Core principles:</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>Schedule deep work blocks in advance — protect them like meetings</li>
+          <li>Eliminate distractions during blocks: phone away, notifications off</li>
+          <li>Embrace boredom — resist the urge to check feeds during breaks</li>
+          <li>Quit shallow work at a set time each day to preserve mental energy</li>
         </ul>
       </div>
       <div>
-        <p className="font-bold text-bark mb-1">📊 Urgent/Important Matrix</p>
-        <ul className="list-disc list-inside space-y-0.5 pl-1">
-          <li>Q1 Do First: Urgent & Important — Crises, deadlines</li>
-          <li>Q2 Schedule: Not Urgent & Important — Planning, prevention</li>
-          <li>Q3 Delegate: Urgent & Not Important — Interruptions, emails</li>
-          <li>Q4 Eliminate: Not Urgent & Not Important — Time wasters</li>
-        </ul>
-        <p className="mt-2">
-          In this app: Q1 = High Priority, Q2 = Medium Priority,
-          Q3 = Low Priority/Delegate, Q4 = new tasks default
+        <p className="font-bold text-bark/80 mb-1">Focus Queue — limiting tasks for depth:</p>
+        <p className="mb-1">
+          The Focus Queue intentionally caps you at 3–5 tasks per session. More than 5
+          tasks signals shallow planning; fewer than 3 is fine for intensive work.
         </p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>3 tasks — maximum depth, complex or creative work requiring long stretches</li>
+          <li>4 tasks — balanced day with one or two multi-pomodoro tasks</li>
+          <li>5 tasks — varied day, shorter tasks, or 8+ hour work day</li>
+        </ul>
+      </div>
+      <div>
+        <p className="font-bold text-bark/80 mb-1">In this app:</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>Add tasks to Focus Queue from Clarify via ⋮ menu → Add to Focus</li>
+          <li>Activate a task in Focus tab, then start a Pomodoro — one task at a time</li>
+          <li>Keep Capture open in a second tab to catch stray thoughts without losing focus</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function EisenhowerSection() {
+  return (
+    <div className="space-y-3">
+      <p>
+        The Eisenhower Matrix, popularised by Stephen Covey in <em>The 7 Habits of Highly Effective People</em>,
+        organises tasks by two axes — urgency and importance — to help you spend less time
+        fighting fires and more time on work that moves the needle.
+      </p>
+      <div>
+        <p className="font-bold text-bark/80 mb-1">The four quadrants:</p>
+        <div className="space-y-2">
+          <div>
+            <p className="font-bold text-bark/70">Q1 — Do First (Urgent &amp; Important)</p>
+            <p>Crises, hard deadlines, emergencies. Act immediately. Aim to shrink this quadrant over time by better planning — most Q1 items arrive because Q2 was neglected.</p>
+          </div>
+          <div>
+            <p className="font-bold text-bark/70">Q2 — Schedule (Not Urgent, Important)</p>
+            <p>Strategic planning, skill-building, relationship maintenance, prevention. This is where high performers live. Block time for Q2 proactively — it rarely feels urgent until it's too late.</p>
+          </div>
+          <div>
+            <p className="font-bold text-bark/70">Q3 — Delegate (Urgent, Not Important)</p>
+            <p>Interruptions, some emails, requests that feel pressing but don't serve your goals. Handle quickly, delegate when possible, or reschedule. Don't let Q3 crowd out Q2.</p>
+          </div>
+          <div>
+            <p className="font-bold text-bark/70">Q4 — Eliminate (Not Urgent, Not Important)</p>
+            <p>Mindless scrolling, busywork, excessive re-checking. Minimise ruthlessly. New tasks land here by default so you must consciously promote them — this prevents reactive prioritisation.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p className="font-bold text-bark/80 mb-1">In this app (Clarify tab):</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>New tasks default to Q4 — forcing a deliberate placement decision</li>
+          <li>Drag tasks between quadrants to reprioritise on desktop</li>
+          <li>Use ⋮ menu → Edit to change quadrant on mobile</li>
+          <li>Review tab shows your quadrant distribution — a healthy week has most tasks in Q1/Q2</li>
+        </ul>
       </div>
     </div>
   );
