@@ -5,7 +5,6 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { useAppDataContext } from '../hooks/useAppData.js';
 import { useDesk } from '../hooks/useResponsive.js';
-import { usePersistedState } from '../hooks/usePersistedState.js';
 import { I } from '../components/icons.jsx';
 import { PRESETS } from '../lib/utils.js';
 
@@ -15,18 +14,14 @@ const MODES = {
   long:  { label: 'Long Break',  key: 'long' },
 };
 
-const DEFAULT_TIMER = { mode: 'work', left: 25 * 60, run: false, endAt: null, startAt: null, elapsed: 0 };
-
 export function Focus() {
   const {
     todos, focus, preset, customT,
     addToFocus, removeFromFocus, reorderFocus,
     recordPom, recordTaskDone,
+    timerState, setTimerState,
   } = useAppDataContext();
   const isDesk = useDesk();
-
-  // Persisted timer state
-  const [timerState, setTimerState] = usePersistedState('focusTimerState', DEFAULT_TIMER);
 
   // Live display countdown (derived from timerState)
   const [display, setDisplay] = useState(timerState.left);
@@ -240,9 +235,12 @@ export function Focus() {
 
         <div className="flex-1 overflow-y-auto">
           {queueTodos.length === 0 ? (
-            <p className="px-4 py-6 text-sm text-bark/40 font-semibold text-center">
-              Add tasks from Clarify to focus on them here
-            </p>
+            <div className="flex flex-col items-center gap-2 px-4 py-8 text-center">
+              <I.Zap width={40} height={40} className="text-bark/15" />
+              <p className="text-sm text-bark/40 font-semibold">
+                Add tasks from Clarify to focus on them here
+              </p>
+            </div>
           ) : (
             <ul className="p-3 space-y-2">
               {queueTodos.map((todo) => (

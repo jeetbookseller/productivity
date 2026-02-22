@@ -1,6 +1,6 @@
 {
   "name": "productivity-hub",
-  "version": "18.0.0-alpha",
+  "version": "2.0.0-alpha",
   "private": true,
   "type": "module",
   "scripts": {

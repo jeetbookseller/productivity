@@ -10,7 +10,6 @@ import { dlFile, notify, shareItem, PRESETS, encodeSync, decodeSync } from '../l
 import { QRCanvas } from '../components/QRCanvas.jsx';
 import { I } from '../components/icons.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
-import { AboutModal } from '../components/AboutModal.jsx';
 
 // Lazy-load TestRunner
 const TestRunner = lazy(() => import('../components/TestRunner.jsx').catch(() => ({
@@ -30,6 +29,29 @@ const THEMES = [
 const PRESET_LIST = Object.entries(PRESETS)
   .filter(([, v]) => v !== null)
   .map(([key, val]) => ({ key, label: val.label, work: val.work, short: val.short, long: val.long }));
+
+const METHODOLOGY_ITEMS = [
+  {
+    title: 'Bullet Journal',
+    body: 'A rapid-logging system invented by Ryder Carroll. Tasks, events, and notes are captured with symbols and migrated regularly. The Capture tab draws from this brain-dump philosophy.',
+  },
+  {
+    title: 'GTD (Getting Things Done)',
+    body: "David Allen's five-step framework: Capture → Clarify → Organise → Reflect → Engage. This app's tab flow maps directly to those phases.",
+  },
+  {
+    title: 'Pomodoro Technique',
+    body: 'Invented by Francesco Cirillo: 25 minutes of focused work followed by a 5-minute break. After four sessions, take a longer break. Used in the Focus tab timer.',
+  },
+  {
+    title: 'Deep Work',
+    body: "Cal Newport's concept: scheduled, distraction-free sessions for cognitively demanding tasks produce disproportionate results. The Focus queue and persistent timer embody this.",
+  },
+  {
+    title: 'Eisenhower Matrix',
+    body: 'A 2×2 grid that sorts tasks by urgency × importance: Do First (urgent + important), Schedule (not urgent + important), Delegate (urgent + not important), Eliminate (neither). Used in Clarify.',
+  },
+];
 
 const EXPLAINER_ITEMS = [
   {
@@ -82,14 +104,12 @@ export function Settings() {
 
   // Accordion state
   const [openAccordion, setOpenAccordion] = useState(null);
+  const [openMethodologyAccordion, setOpenMethodologyAccordion] = useState(null);
 
   // Share Data state
   const [qrOpen, setQrOpen] = useState(false);
   const [qrCode, setQrCode] = useState('');
   const [importCode, setImportCode] = useState('');
-
-  // Help modal
-  const [helpOpen, setHelpOpen] = useState(false);
 
   // PWA install
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -375,18 +395,29 @@ export function Settings() {
           </Card>
         )}
 
-        {/* ── Help ─────────────────────────────────────────────────────── */}
-        <Card title="Help">
-          <button
-            onClick={() => setHelpOpen(true)}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-sand
-              font-semibold text-sm text-bark hover:bg-cream transition-colors text-left"
-            aria-label="Show help"
-          >
-            <I.Info width={16} height={16} />
-            Show Help Guide
-          </button>
-        </Card>
+        {/* ── Methodologies ─────────────────────────────────────────────── */}
+        <div className={isDesk ? 'col-span-2' : ''}>
+          <Card title="Methodologies">
+            <div className={isDesk ? 'grid grid-cols-2 gap-3' : 'space-y-1'}>
+              {METHODOLOGY_ITEMS.map((item, idx) => (
+                isDesk ? (
+                  <div key={idx} className="bg-cream rounded-xl p-4 border border-sand/60">
+                    <p className="text-sm font-bold text-bark mb-1">{item.title}</p>
+                    <p className="text-xs font-semibold text-bark/60 leading-relaxed">{item.body}</p>
+                  </div>
+                ) : (
+                  <AccordionItem
+                    key={idx}
+                    title={item.title}
+                    body={item.body}
+                    open={openMethodologyAccordion === idx}
+                    onToggle={() => setOpenMethodologyAccordion(openMethodologyAccordion === idx ? null : idx)}
+                  />
+                )
+              ))}
+            </div>
+          </Card>
+        </div>
 
         {/* ── Explainer ─────────────────────────────────────────────────── */}
         <div className={isDesk ? 'col-span-2' : ''}>
@@ -466,7 +497,6 @@ export function Settings() {
         </div>
       )}
 
-      <AboutModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }

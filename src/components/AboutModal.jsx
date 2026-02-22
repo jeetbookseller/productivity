@@ -79,18 +79,18 @@ export function AboutModal({ open, onClose }) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end md:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-bark/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative bg-surface w-full md:max-w-2xl rounded-t-2xl md:rounded-2xl
-        shadow-xl max-h-[85vh] flex flex-col anim-in">
+      <div className="relative bg-surface w-full max-w-lg rounded-2xl
+        shadow-xl max-h-[80vh] flex flex-col anim-in">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-sand flex-shrink-0">
           <div>
             <h2 className="text-base font-bold text-bark">Productivity Hub</h2>
-            <p className="text-xs text-bark/50 font-semibold">v18.0-Alpha</p>
+            <p className="text-xs text-bark/50 font-semibold">v2-alpha</p>
           </div>
           <button onClick={onClose} className="text-bark/40 hover:text-bark transition-colors">
             <I.X width={20} height={20} />
