@@ -22,6 +22,16 @@
   --surface: 42 36 32;
 }
 
+/* Lock html/body so the browser never makes them the scroll container.
+   After a pull-to-refresh reload on mobile the browser can start scrolling
+   the document instead of <main>, which breaks sticky headers and pushes the
+   fixed bottom nav off-screen. Forcing overflow:hidden here guarantees all
+   scrolling is confined to the designated <main> element. */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Base font */
 body {
   font-family: 'Nunito', sans-serif;
