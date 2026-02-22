@@ -1,17 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- Background: sage green fills entire canvas for maskable icon -->
-  <rect width="512" height="512" rx="96" fill="#7CB69D"/>
-  <!-- Decorative ring -->
-  <circle cx="256" cy="256" r="180" fill="none" stroke="#F7F5F0" stroke-width="14" opacity="0.5"/>
-  <!-- Letterform P — vertical stem -->
-  <rect x="176" y="160" width="24" height="192" rx="12" fill="#F7F5F0"/>
-  <!-- P — top bar -->
-  <rect x="176" y="160" width="120" height="24" rx="12" fill="#F7F5F0"/>
-  <!-- P — middle bar -->
-  <rect x="176" y="232" width="120" height="24" rx="12" fill="#F7F5F0"/>
-  <!-- P — right bowl -->
-  <rect x="272" y="160" width="24" height="96" rx="12" fill="#F7F5F0"/>
-  <!-- Accent: terracotta dot -->
-  <circle cx="336" cy="320" r="28" fill="#E07A5F"/>
-  <circle cx="336" cy="320" r="14" fill="#F7F5F0"/>
+  <defs>
+    <linearGradient id="gearGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5BC8D0"/>
+      <stop offset="100%" stop-color="#2980B9"/>
+    </linearGradient>
+    <linearGradient id="arrowGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4CAF50"/>
+      <stop offset="100%" stop-color="#F5A623"/>
+    </linearGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#27AE60"/>
+      <stop offset="100%" stop-color="#2EC4B6"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background: white rounded square -->
+  <rect width="512" height="512" rx="96" fill="white"/>
+
+  <!-- Gear ring (outer) -->
+  <circle cx="220" cy="256" r="148" fill="none" stroke="url(#gearGrad)" stroke-width="28"/>
+  <!-- Gear teeth (12 teeth) -->
+  <g fill="url(#gearGrad)">
+    <rect x="208" y="92" width="24" height="32" rx="6"/>
+    <rect x="208" y="388" width="24" height="32" rx="6"/>
+    <rect x="363" y="136" width="32" height="24" rx="6" transform="rotate(30 363 136)"/>
+    <rect x="363" y="352" width="32" height="24" rx="6" transform="rotate(-30 363 352)"/>
+    <rect x="56" y="136" width="32" height="24" rx="6" transform="rotate(-30 56 136)"/>
+    <rect x="56" y="352" width="32" height="24" rx="6" transform="rotate(30 56 352)"/>
+    <rect x="384" y="244" width="32" height="24" rx="6"/>
+    <rect x="48" y="244" width="32" height="24" rx="6"/>
+    <rect x="316" y="100" width="24" height="32" rx="6" transform="rotate(60 316 100)"/>
+    <rect x="100" y="100" width="24" height="32" rx="6" transform="rotate(-60 100 100)"/>
+    <rect x="316" y="380" width="24" height="32" rx="6" transform="rotate(-60 316 380)"/>
+    <rect x="100" y="380" width="24" height="32" rx="6" transform="rotate(60 100 380)"/>
+  </g>
+
+  <!-- Compass star (4-pointed) centered at 220,256 -->
+  <polygon points="220,148 235,240 220,256 205,240" fill="url(#starGrad)"/>
+  <polygon points="220,364 235,272 220,256 205,272" fill="url(#starGrad)" opacity="0.85"/>
+  <polygon points="112,256 204,241 220,256 204,271" fill="url(#starGrad)" opacity="0.85"/>
+  <polygon points="328,256 236,241 220,256 236,271" fill="url(#starGrad)"/>
+
+  <!-- "P" letterform (teal, bold) -->
+  <g fill="none" stroke="#2EC4B6" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Vertical stem -->
+    <rect x="190" y="176" width="30" height="168" rx="8" fill="#2EC4B6" stroke="none"/>
+    <!-- Top bar -->
+    <rect x="190" y="176" width="80" height="30" rx="8" fill="#2EC4B6" stroke="none"/>
+    <!-- Mid bar -->
+    <rect x="190" y="246" width="80" height="30" rx="8" fill="#2EC4B6" stroke="none"/>
+    <!-- Right bowl -->
+    <rect x="262" y="176" width="30" height="100" rx="8" fill="#2EC4B6" stroke="none"/>
+  </g>
+
+  <!-- Upward-right arrow -->
+  <line x1="300" y1="360" x2="420" y2="190" stroke="url(#arrowGrad)" stroke-width="26" stroke-linecap="round"/>
+  <!-- Arrow head -->
+  <polygon points="420,190 388,210 400,240" fill="#F5A623"/>
+  <polygon points="420,190 400,160 376,188" fill="#F5A623"/>
 </svg>
