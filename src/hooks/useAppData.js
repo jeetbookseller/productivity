@@ -33,6 +33,11 @@ const DEFAULT_MET = {
   w: { p: 0, t: 0, m: 0 },
 };
 
+const DEFAULT_TIMER = {
+  mode: 'work', left: 25 * 60, run: false,
+  endAt: null, startAt: null, elapsed: 0,
+};
+
 // ── Main hook ──────────────────────────────────────────────────────────────────
 
 export function useAppData() {
@@ -48,7 +53,8 @@ export function useAppData() {
   const [dHist,     setDHist]     = usePersistedState('dHist',     []);
   const [fHist,     setFHist]     = usePersistedState('fHist',     []);
   const [tab,       setTab]       = usePersistedState('tab',       'capture');
-  const [seenAbout, setSeenAbout] = usePersistedState('seenAbout', false);
+  const [seenAbout,   setSeenAbout]   = usePersistedState('seenAbout',       false);
+  const [timerState,  setTimerState]  = usePersistedState('focusTimerState', DEFAULT_TIMER);
 
   // Refs for reading current state inside callbacks without stale closures
   const notesRef = useRef(notes);
@@ -292,10 +298,10 @@ export function useAppData() {
   return {
     // State
     todos, notes, lists, focus, theme, preset, customT,
-    poms, met, dHist, fHist, tab, seenAbout,
+    poms, met, dHist, fHist, tab, seenAbout, timerState,
 
     // Raw setters
-    setCustomT, setTab, setSeenAbout, setDHist, setFHist,
+    setCustomT, setTab, setSeenAbout, setDHist, setFHist, setTimerState,
 
     // Theme / Preset
     setTheme, setPreset,

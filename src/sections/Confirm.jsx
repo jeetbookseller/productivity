@@ -152,9 +152,12 @@ export function Confirm() {
         </div>
 
         {lists.length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm font-semibold text-bark/40">
-            No checklists yet — create one above
-          </p>
+          <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+            <I.Checkbox width={40} height={40} className="text-bark/15" />
+            <p className="text-sm font-semibold text-bark/40">
+              No checklists yet — create one above
+            </p>
+          </div>
         ) : (
           <div className="px-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             {lists.map((list) => (

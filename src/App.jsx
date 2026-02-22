@@ -6,7 +6,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppDataProvider } from './components/AppDataProvider.jsx';
 import { useAppDataContext } from './hooks/useAppData.js';
-import { usePersistedState } from './hooks/usePersistedState.js';
 import { useWide } from './hooks/useResponsive.js';
 import { I } from './components/icons.jsx';
 import { AboutModal } from './components/AboutModal.jsx';
@@ -19,11 +18,6 @@ import { Review   } from './sections/Review.jsx';
 import { Settings } from './sections/Settings.jsx';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
-
-const DEFAULT_TIMER = {
-  mode: 'work', left: 25 * 60, run: false,
-  endAt: null, startAt: null, elapsed: 0,
-};
 
 const TABS = [
   { key: 'capture',  label: 'Capture',  Icon: I.Clock     },
@@ -107,8 +101,7 @@ function NavButton({ tabKey, label, Icon, active, onClick, showTimerBadge, timer
 // ── AppShell ─────────────────────────────────────────────────────────────────
 
 function AppShell() {
-  const { tab, setTab, seenAbout, setSeenAbout } = useAppDataContext();
-  const [timerState] = usePersistedState('focusTimerState', DEFAULT_TIMER);
+  const { tab, setTab, seenAbout, setSeenAbout, timerState } = useAppDataContext();
   const [showAbout, setShowAbout] = useState(() => !seenAbout);
   const isWide = useWide();
 
@@ -154,7 +147,7 @@ function AppShell() {
     <ThemeProv>
       {isWide ? (
         /* ── Desktop: sidebar layout ──────────────────────────────────────── */
-        <div className="flex h-screen bg-cream overflow-hidden">
+        <div className="flex h-[100dvh] bg-cream overflow-hidden">
           <aside className="w-48 bg-surface border-r border-sand flex flex-col py-4 gap-1 px-2 flex-shrink-0">
             <div className="px-3 pb-4 mb-2 border-b border-sand">
               <p className="text-[10px] font-bold text-bark/40 uppercase tracking-wide">Productivity</p>
@@ -170,7 +163,7 @@ function AppShell() {
         </div>
       ) : (
         /* ── Mobile: bottom tab bar layout ───────────────────────────────── */
-        <div className="flex flex-col h-screen bg-cream">
+        <div className="flex flex-col h-[100dvh] bg-cream">
           <main className="flex-1 overflow-y-auto min-h-0">
             <ActiveSection />
           </main>
