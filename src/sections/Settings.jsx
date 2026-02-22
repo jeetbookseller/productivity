@@ -105,6 +105,7 @@ export function Settings() {
   // Accordion state
   const [openAccordion, setOpenAccordion] = useState(null);
   const [openMethodologyAccordion, setOpenMethodologyAccordion] = useState(null);
+  const [openCompleteGuide, setOpenCompleteGuide] = useState(false);
 
   // Share Data state
   const [qrOpen, setQrOpen] = useState(false);
@@ -395,6 +396,30 @@ export function Settings() {
           </Card>
         )}
 
+        {/* ── How it works ──────────────────────────────────────────────── */}
+        <div className={isDesk ? 'col-span-2' : ''}>
+          <Card title="How it works">
+            <div className={isDesk ? 'grid grid-cols-2 gap-3' : 'space-y-1'}>
+              {EXPLAINER_ITEMS.map((item, idx) => (
+                isDesk ? (
+                  <div key={idx} className="bg-cream rounded-xl p-4 border border-sand/60">
+                    <p className="text-sm font-bold text-bark mb-1">{item.title}</p>
+                    <p className="text-xs font-semibold text-bark/60 leading-relaxed">{item.body}</p>
+                  </div>
+                ) : (
+                  <AccordionItem
+                    key={idx}
+                    title={item.title}
+                    body={item.body}
+                    open={openAccordion === idx}
+                    onToggle={() => setOpenAccordion(openAccordion === idx ? null : idx)}
+                  />
+                )
+              ))}
+            </div>
+          </Card>
+        </div>
+
         {/* ── Methodologies ─────────────────────────────────────────────── */}
         <div className={isDesk ? 'col-span-2' : ''}>
           <Card title="Methodologies">
@@ -416,29 +441,14 @@ export function Settings() {
                 )
               ))}
             </div>
-          </Card>
-        </div>
-
-        {/* ── Explainer ─────────────────────────────────────────────────── */}
-        <div className={isDesk ? 'col-span-2' : ''}>
-          <Card title="How it works">
-            <div className={isDesk ? 'grid grid-cols-2 gap-3' : 'space-y-1'}>
-              {EXPLAINER_ITEMS.map((item, idx) => (
-                isDesk ? (
-                  <div key={idx} className="bg-cream rounded-xl p-4 border border-sand/60">
-                    <p className="text-sm font-bold text-bark mb-1">{item.title}</p>
-                    <p className="text-xs font-semibold text-bark/60 leading-relaxed">{item.body}</p>
-                  </div>
-                ) : (
-                  <AccordionItem
-                    key={idx}
-                    title={item.title}
-                    body={item.body}
-                    open={openAccordion === idx}
-                    onToggle={() => setOpenAccordion(openAccordion === idx ? null : idx)}
-                  />
-                )
-              ))}
+            {/* Complete Guide — always collapsible, collapsed by default on both mobile and desktop */}
+            <div className="mt-3">
+              <AccordionItem
+                title="📚 Complete Guide"
+                body={<CompleteGuideBody />}
+                open={openCompleteGuide}
+                onToggle={() => setOpenCompleteGuide((v) => !v)}
+              />
             </div>
           </Card>
         </div>
@@ -502,6 +512,177 @@ export function Settings() {
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
+
+function CompleteGuideBody() {
+  return (
+    <div className="max-h-[32rem] overflow-y-auto space-y-4 pr-1">
+
+      <p>
+        Productivity Hub combines the Bullet Journal method, GTD (Getting Things Done),
+        Deep Work, and the Eisenhower Matrix into one seamless workflow.
+      </p>
+
+      {/* The Workflow */}
+      <section>
+        <p className="font-bold text-bark mb-2">🔄 The Workflow</p>
+        <p className="mb-3">
+          Every productivity system follows one cycle. Ours has five steps, each mapped to a tab:
+        </p>
+        {[
+          {
+            icon: '📝', n: '1', title: 'Capture',
+            body: "Get everything out of your head. Jot quick bullet notes — ideas, tasks, thoughts, anything. Don't organize yet, just capture. Tap to edit inline, use ⋮ menu for actions (promote to Clarify, strikethrough, delete), or use the ☐ header checkbox for bulk operations.",
+          },
+          {
+            icon: '📋', n: '2', title: 'Clarify',
+            body: "Decide what each item means. Place tasks in the Eisenhower Matrix: Do First, Schedule, Delegate, or Eliminate. Add categories, deadlines, and subtasks. Drag tasks between quadrants to re-prioritize. Tap any task to toggle done/undone. Use ⋮ menu or right-click (desktop) for actions: edit, add to Focus Queue, link a checklist, or delete.",
+          },
+          {
+            icon: '🎯', n: '3', title: 'Focus',
+            body: "Pick 3–5 tasks for today's Focus Queue. Use the Pomodoro timer: 25 min work, 5 min break. After 4 cycles, take a longer break. On desktop, timer and queue display side-by-side. When the timer is running, a live countdown replaces the Focus tab label.",
+          },
+          {
+            icon: '✅', n: '4', title: 'Confirm',
+            body: "Use checklists to break tasks into steps. Link a checklist to a Clarify task via ⋮ menu → Link Checklist. When all items are checked, you'll be prompted to mark the task done. Tap items to toggle done, use ⋮ to edit or delete, and ☐ header checkbox for bulk operations.",
+          },
+          {
+            icon: '📊', n: '5', title: 'Review',
+            body: 'Check your weekly stats, matrix balance, and insights. The Review tab analyzes your patterns — overloaded quadrants, overdue tasks, unprocessed notes — and suggests next actions. On desktop, displays as a 2-column dashboard. Do this weekly.',
+          },
+        ].map(({ icon, n, title, body }) => (
+          <div key={n} className="mb-3">
+            <p className="font-bold text-bark mb-1">{icon} {n}. {title}</p>
+            <p>{body}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* Daily Workflow */}
+      <section>
+        <p className="font-bold text-bark mb-2">🚀 Daily Workflow</p>
+        {[
+          {
+            heading: 'Morning (5 min)',
+            items: [
+              'Open Capture — jot anything on your mind',
+              'Go to Clarify — review matrix, drag tasks to correct quadrants',
+              'Tap → on 3–5 tasks to add them to Focus queue',
+              'Optionally check Confirm for any process checklists',
+            ],
+          },
+          {
+            heading: 'Work Sessions (2–4 hours)',
+            items: [
+              'Open Focus, tap a task to activate it',
+              'Start Pomodoro — 25 min of deep work',
+              'Take 5 min break, then repeat',
+              'After 4 pomodoros, take a 15 min long break',
+              'Quick-capture stray thoughts in Capture to stay focused',
+            ],
+          },
+          {
+            heading: 'End of Day (5 min)',
+            items: [
+              'Clear completed tasks (🧹 button in Clarify)',
+              'Process any unread Capture notes → strikethrough or → Clarify',
+              "Glance at Review for today's pomodoro count and streak",
+              'Set priorities for tomorrow in Clarify',
+            ],
+          },
+        ].map(({ heading, items }) => (
+          <div key={heading} className="mb-3">
+            <p className="font-bold text-bark/80 mb-1">{heading}</p>
+            <ol className="list-decimal list-inside space-y-0.5 pl-1">
+              {items.map((item, i) => <li key={i}>{item}</li>)}
+            </ol>
+          </div>
+        ))}
+      </section>
+
+      {/* Bullet Journal */}
+      <section>
+        <p className="font-bold text-bark mb-2">📓 Bullet Journal Method</p>
+        <p className="mb-2">
+          The Capture tab is inspired by Ryder Carroll's Bullet Journal — a rapid logging system
+          that clears your mind so you can focus.
+        </p>
+        <p className="font-bold text-bark/80 mb-1">Rapid Logging:</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1 mb-3">
+          <li>Capture everything — tasks, ideas, thoughts, questions</li>
+          <li>One bullet per thought — keep it short and atomic</li>
+          <li>Press Enter to add instantly, no friction</li>
+          <li>Don't organize yet — that's what Clarify is for</li>
+        </ul>
+        <p className="font-bold text-bark/80 mb-1">Migration (Processing Notes):</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1 mb-3">
+          <li>Tap: Edit a note inline</li>
+          <li>⋮ Menu: Edit, Promote to Clarify, Strikethrough, or Delete</li>
+          <li>Right-click (desktop): Same actions as ⋮</li>
+          <li>☐ Checkbox (top-right): Bulk actions — Move to Clarify, Strikethrough, Delete</li>
+          <li>Auto-clear: Struck-through notes removed after 30 days</li>
+        </ul>
+        <p>Day Sections: Notes grouped by day — Today, Yesterday, and past dates.</p>
+      </section>
+
+      {/* GTD Weekly Review */}
+      <section>
+        <p className="font-bold text-bark mb-2">📊 GTD Weekly Review</p>
+        <p className="font-bold text-bark/80 mb-1">Weekly Review Checklist:</p>
+        <ol className="list-decimal list-inside space-y-0.5 pl-1 mb-3">
+          <li>Get Clear — Process all Capture notes (migrate or strike)</li>
+          <li>Get Current — Review Clarify matrix, update or delete stale tasks</li>
+          <li>Get Creative — Check Review insights, act on suggestions</li>
+        </ol>
+        <p className="font-bold text-bark/80 mb-1">What Review Tab Shows:</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>Weekly stats: Pomodoros, tasks completed, focus time</li>
+          <li>Streak heatmap: 13-week grid — darker = more pomodoros</li>
+          <li>Streak counter: Current consecutive days and longest streak</li>
+          <li>Matrix overview: Active tasks per quadrant</li>
+          <li>Insights: Overloaded quadrants, overdue tasks, unprocessed notes</li>
+          <li>Next actions: Specific suggestions based on patterns</li>
+        </ul>
+      </section>
+
+      {/* Pomodoro */}
+      <section>
+        <p className="font-bold text-bark mb-2">🍅 Pomodoro Technique</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>Work Session: 25 minutes</li>
+          <li>Short Break: 5 minutes</li>
+          <li>Repeat 4 times</li>
+          <li>Long Break: 15 minutes after 4 cycles</li>
+        </ul>
+      </section>
+
+      {/* Deep Work */}
+      <section>
+        <p className="font-bold text-bark mb-2">🎯 Deep Work & Focus Queue</p>
+        <p className="mb-1">Focus Queue limits you to 3–5 tasks to maximize focus.</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>3 Tasks: For highly complex work, maximum focus</li>
+          <li>5 Tasks: For varied responsibilities, 8+ hour days</li>
+        </ul>
+      </section>
+
+      {/* Eisenhower Matrix */}
+      <section>
+        <p className="font-bold text-bark mb-2">📊 Urgent/Important Matrix</p>
+        <ul className="list-disc list-inside space-y-0.5 pl-1">
+          <li>Q1 Do First: Urgent & Important — Crises, deadlines</li>
+          <li>Q2 Schedule: Not Urgent & Important — Planning, prevention</li>
+          <li>Q3 Delegate: Urgent & Not Important — Interruptions, emails</li>
+          <li>Q4 Eliminate: Not Urgent & Not Important — Time wasters</li>
+        </ul>
+        <p className="mt-2">
+          In this app: Q1 = High Priority, Q2 = Medium Priority,
+          Q3 = Low Priority/Delegate, Q4 = new tasks default
+        </p>
+      </section>
+
+    </div>
+  );
+}
 
 function Card({ title, children }) {
   return (

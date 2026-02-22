@@ -1,72 +1,17 @@
 /**
  * AboutModal — about/help modal
- * Mobile: 7 collapsible accordion sections
- * Tablet+ (md): 2-column grid
+ * Flat non-collapsible summary of the 5 workflow tabs.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { I } from './icons.jsx';
 
-const SECTIONS = [
-  {
-    title: '📥 Capture',
-    body: 'Brain-dump anything instantly. Tap an item to edit inline. Use the 3-dot menu to promote a note to a Clarify task, strike it through, copy it, or delete it. The header checkbox enters bulk-select mode.',
-  },
-  {
-    title: '🗂 Clarify',
-    body: 'Organize tasks across the Eisenhower Matrix — Do First (urgent+important), Schedule, Delegate, and Eliminate. Tap a task to mark it done. Add subtasks, a deadline, and pomodoro counts. Link a task to a Confirm checklist for step-by-step tracking.',
-  },
-  {
-    title: '⏱ Focus',
-    body: 'Run Pomodoro sessions against your Focus Queue (up to 5 tasks from Clarify). Choose Classic (25/5/15), Long (50/10/20), Short (15/3/10), or a Custom preset. The timer persists if you switch tabs.',
-  },
-  {
-    title: '✅ Confirm',
-    body: 'Create named checklists with optional sections. Tap items to check them off. Checklists can be linked from Clarify tasks so you can walk through a workflow step by step.',
-  },
-  {
-    title: '📊 Review',
-    body: 'See weekly metrics: pomodoros completed, tasks done, and focus minutes. A 13-week heatmap shows your daily activity. Current and longest streaks are tracked automatically.',
-  },
-  {
-    title: '⚙️ Settings',
-    body: 'Switch between Light, Dark, and System theme. Adjust timer preset durations. Export all data as a JSON backup, import from a previous backup, or reset everything. Install the app to your home screen for offline access.',
-  },
-  {
-    title: '🔄 Cross-Device Sync',
-    body: 'Share your data between devices without any account. In Settings → Data, tap "Share Data" to generate a sync code. Copy or share it, then paste it on another device to import your data instantly.',
-  },
+const STEPS = [
+  { icon: '📝', step: 'Capture',  desc: 'Brain dump everything. No organizing yet.' },
+  { icon: '🎯', step: 'Clarify',  desc: 'Sort by urgency & importance. Tap to toggle done. ⋮ for actions.' },
+  { icon: '⏱',  step: 'Focus',   desc: 'Queue 3–5 tasks. Work in timed sessions.' },
+  { icon: '✅', step: 'Confirm',  desc: 'Checklists for tasks. Link from Clarify to break work into steps.' },
+  { icon: '📊', step: 'Review',   desc: 'Weekly stats, streaks & insights.' },
 ];
-
-function AccordionItem({ title, body }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="border-b border-sand/70 last:border-0">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3.5 text-sm font-bold text-bark text-left"
-      >
-        <span>{title}</span>
-        <span className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>
-          <I.ChevronDown width={16} height={16} className="text-bark/40" />
-        </span>
-      </button>
-      {open && (
-        <p className="px-4 pb-4 text-sm text-bark/70 font-semibold leading-relaxed">
-          {body}
-        </p>
-      )}
-    </div>
-  );
-}
-
-function GridCard({ title, body }) {
-  return (
-    <div className="bg-cream rounded-xl p-4">
-      <h4 className="text-sm font-bold text-bark mb-2">{title}</h4>
-      <p className="text-sm text-bark/70 font-semibold leading-relaxed">{body}</p>
-    </div>
-  );
-}
 
 export function AboutModal({ open, onClose }) {
   useEffect(() => {
@@ -97,20 +42,36 @@ export function AboutModal({ open, onClose }) {
           </button>
         </div>
 
-        {/* Content */}
+        {/* Content — flat non-collapsible */}
         <div className="overflow-y-auto flex-1">
-          {/* Mobile: accordion */}
-          <div className="md:hidden">
-            {SECTIONS.map((s) => (
-              <AccordionItem key={s.title} title={s.title} body={s.body} />
-            ))}
-          </div>
+          <div className="px-5 py-4 space-y-4">
 
-          {/* Tablet+: 2-column grid */}
-          <div className="hidden md:grid grid-cols-2 gap-3 p-5">
-            {SECTIONS.map((s) => (
-              <GridCard key={s.title} title={s.title} body={s.body} />
-            ))}
+            <p className="text-sm font-bold text-bark">🌿 About Productivity</p>
+
+            {/* 5 steps */}
+            <div className="space-y-3">
+              {STEPS.map(({ icon, step, desc }) => (
+                <div key={step} className="flex gap-3 items-start">
+                  <span className="text-base leading-snug flex-shrink-0">{icon}</span>
+                  <p className="text-sm font-semibold text-bark/80 leading-snug">
+                    <span className="font-bold text-bark">{step}</span>
+                    {' — '}
+                    {desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Workflow tagline */}
+            <p className="text-xs font-bold text-bark/50 tracking-wide text-center pt-1">
+              Capture → Clarify → Focus → Confirm → Review → Repeat
+            </p>
+
+            {/* Footer note */}
+            <p className="text-xs font-semibold text-bark/50 text-center border-t border-sand pt-3">
+              📚 Visit <span className="font-bold text-bark/70">Settings</span> → Methodologies for the full guide
+            </p>
+
           </div>
         </div>
       </div>
