@@ -34,7 +34,9 @@ All application state lives in `src/hooks/useAppData.js`, which exposes a React 
 - **localStorage** — synchronous, used for instant first-render hydration.
 - **IndexedDB** — async truth source (`src/lib/storage.js`), debounced writes at 300 ms. On mount, IndexedDB overwrites localStorage when a stored value is present.
 
-Do not bypass this hook for persistent state. Do not add a backend or cloud sync layer.
+Do not bypass this hook for persistent state.
+
+**Planned: Supabase sync layer** — see "Planned Work" section below. When implemented, `usePersistedState` will push to Supabase (debounced 2s) on every write and pull+merge on mount when the user is signed in. Sync is opt-in; the offline-first path remains unchanged for unauthenticated users.
 
 ### Routing
 
@@ -96,10 +98,80 @@ The Vite base path is `/productivity/` — required for GitHub Pages subdirector
 
 ## Conventions
 
-- **No backend.** All features must work entirely in the browser.
-- **No new dependencies** without a clear need. The bundle is intentionally lean.
+- **No backend** beyond Supabase sync (opt-in, see Planned Work). All features must work without an account.
+- **No new dependencies** without a clear need. Exception: `@supabase/supabase-js` is approved for the sync feature.
 - **No CSS frameworks** beyond Tailwind. Do not add CSS-in-JS libraries.
 - **No client-side router.** Tab state is managed in `App.jsx`.
 - Use the existing `uid()` helper from `src/lib/utils.js` for generating IDs.
 - Context menus use a 3-dot button and right-click; do not add long-press or swipe gestures.
 - Bulk-select mode is triggered by the section header checkbox — keep this pattern consistent across sections.
+
+---
+
+## Planned Work: Supabase Cross-Device Sync
+
+**Goal:** Optional cloud sync so signed-in users can access their data across devices. Offline-first behavior is preserved for all unauthenticated users.
+
+### New files to create
+
+| File | Purpose |
+|------|---------|
+| `src/lib/supabase.js` | Supabase client + module-level session cache (`currentUser`) |
+| `src/hooks/useAuth.js` | Auth state hook (session, user, signInWithEmail, signInWithMagicLink, signInWithOAuth, signOut) |
+| `src/components/AuthProvider.jsx` | React context wrapper for auth state |
+| `src/lib/sync.js` | `pushKey(userId, key, value)`, `pullAll(userId, keys)`, `mergeValues(key, local, remote)` |
+| `supabase/schema.sql` | `user_data` table + RLS policies SQL script |
+| `.env.example` | Template: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
+
+### Files to modify
+
+| File | Change |
+|------|--------|
+| `src/hooks/usePersistedState.js` | Debounced `pushKey` on write; `pullAll` + merge on mount |
+| `src/sections/Settings.jsx` | "Sync & Account" section: email/password form, magic link, OAuth buttons (Google/GitHub), sync status |
+| `src/App.jsx` | Wrap `AppDataProvider` with `AuthProvider` |
+| `package.json` | Add `@supabase/supabase-js` |
+
+### Supabase DB schema
+
+```sql
+create table user_data (
+  user_id    uuid references auth.users not null,
+  key        text not null,
+  value      jsonb not null,
+  updated_at timestamptz default now() not null,
+  primary key (user_id, key)
+);
+alter table user_data enable row level security;
+create policy "Users manage own data" on user_data for all
+  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+
+Enable in Supabase dashboard: Email (password + magic link), Google OAuth, GitHub OAuth.
+
+### Keys synced (11 of 13)
+
+Synced: `todos`, `notes`, `lists`, `focus`, `theme`, `preset`, `customT`, `poms`, `met`, `dHist`, `fHist`, `seenAbout`
+
+Excluded (device-specific/ephemeral): `tab`, `focusTimerState`
+
+### Merge logic
+
+- **Arrays with `id` field** (`todos`, `notes`, `lists`, `dHist`, `fHist`): union by `id`; remote wins for same-ID conflicts; local-only items preserved (offline additions survive)
+- **`focus`** (array of IDs): union, deduplicated, capped at 5
+- **Scalars** (`theme`, `preset`, `customT`, `poms`, `met`, `seenAbout`): remote wins
+
+### Implementation phases (can be parallelised)
+
+**Phase 1 — Foundation (3 tasks in parallel):**
+- P1-A: `supabase/schema.sql`, `.env.example`
+- P1-B: `src/lib/supabase.js`, `src/hooks/useAuth.js`, `src/components/AuthProvider.jsx`
+- P1-C: `src/lib/sync.js`
+
+**Phase 2 — Integration (2 tasks in parallel, after Phase 1):**
+- P2-A: Modify `src/hooks/usePersistedState.js`
+- P2-B: Auth + sync UI in `src/sections/Settings.jsx`
+
+**Phase 3 — Wire-up & Tests (after Phase 2):**
+- P3-A: Wire `AuthProvider` in `src/App.jsx`, `npm install @supabase/supabase-js`
+- P3-B: Tests — add auth/sync tests, verify all 45 existing tests still pass
