@@ -10,11 +10,13 @@ export function useAuth() {
   const passwordRecoveryRef = useRef(false);
 
   const signInWithPassword = useCallback(async (email, password) => {
+    if (!supabase) return { data: null, error: { message: 'Auth service is not configured.' } };
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     return { data, error };
   }, []);
 
   const signUp = useCallback(async (email, password) => {
+    if (!supabase) return { data: null, error: { message: 'Auth service is not configured.' } };
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (data?.user?.identities?.length === 0) {
       return { data, error: { message: 'An account with this email already exists. Please sign in instead.' } };
@@ -23,6 +25,7 @@ export function useAuth() {
   }, []);
 
   const resetPasswordForEmail = useCallback(async (email) => {
+    if (!supabase) return { data: null, error: { message: 'Auth service is not configured.' } };
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin + window.location.pathname,
     });
@@ -30,12 +33,13 @@ export function useAuth() {
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut();
     setUser(null);
     setSession(null);
   }, []);
 
   const updatePassword = useCallback(async (password) => {
+    if (!supabase) return { data: null, error: { message: 'Auth service is not configured.' } };
     const { data, error } = await supabase.auth.updateUser({ password });
     if (!error) {
       await signOut();
@@ -51,6 +55,7 @@ export function useAuth() {
     let subscription;
 
     async function init() {
+      if (!supabase) { setLoading(false); return; }
       try {
         // Capture hash BEFORE getSession() — Supabase cleans it
         const hash = window.location.hash;
