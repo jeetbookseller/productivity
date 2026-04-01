@@ -260,7 +260,7 @@ export default function AuthForm() {
 
           {mode === 'signup' && signupDone && (
             <div className="rounded-xl px-4 py-3 bg-sage/10 text-sage text-sm font-semibold">
-              Signup successful! Please check your email to confirm your account.
+              Signup successful! Please check your email for a confirmation link from Supabase Auth.
               <div className="mt-3">
                 <span
                   className="text-sage text-sm font-semibold hover:underline cursor-pointer"
