@@ -7,9 +7,8 @@ import { useAppDataContext } from '../hooks/useAppData.js';
 import { useAuthContext } from '../components/AuthProvider.jsx';
 import { useDesk } from '../hooks/useResponsive.js';
 import { S } from '../lib/storage.js';
-import { dlFile, notify, shareItem, PRESETS, encodeSync, decodeSync } from '../lib/utils.js';
+import { dlFile, notify, PRESETS } from '../lib/utils.js';
 import { pushKey, SYNCED_KEYS } from '../lib/sync.js';
-import { QRCanvas } from '../components/QRCanvas.jsx';
 import { I } from '../components/icons.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
 
@@ -83,11 +82,6 @@ export function Settings() {
   const [dailyWorkflowOpen, setDailyWorkflowOpen] = useState(false);
   const [openGuideSection, setOpenGuideSection] = useState(null);
 
-  // Share Data state
-  const [qrOpen, setQrOpen] = useState(false);
-  const [qrCode, setQrCode] = useState('');
-  const [importCode, setImportCode] = useState('');
-
   // PWA install
   const [installPrompt, setInstallPrompt] = useState(null);
   const [testRunnerOpen, setTestRunnerOpen] = useState(false);
@@ -155,47 +149,6 @@ export function Settings() {
     setCustomT({ work: Number(customWork), short: Number(customShort), long: Number(customLong) });
     setPreset('custom');
     notify('Custom timer saved', 'success');
-  };
-
-  const handleCopyCode = async () => {
-    try {
-      const data = await S.exp();
-      const code = encodeSync(data);
-      await navigator.clipboard.writeText(code);
-      notify('Sync code copied to clipboard', 'success');
-    } catch { notify('Could not copy sync code', 'error'); }
-  };
-
-  const handleShareCode = async () => {
-    try {
-      const data = await S.exp();
-      const code = encodeSync(data);
-      await shareItem(code, 'Productivity Hub Sync');
-    } catch { notify('Share failed', 'error'); }
-  };
-
-  const handleShowQR = async () => {
-    try {
-      const data = await S.exp();
-      setQrCode(encodeSync(data));
-      setQrOpen(true);
-    } catch { notify('Could not generate QR', 'error'); }
-  };
-
-  const handleImportCode = async () => {
-    const obj = decodeSync(importCode.trim());
-    if (!obj) { notify('Invalid sync code', 'error'); return; }
-    await S.imp(obj);
-    // Push imported data to Supabase
-    if (user) {
-      for (const key of SYNCED_KEYS) {
-        if (obj[key] !== undefined) {
-          await pushKey(user.id, key, obj[key]);
-        }
-      }
-    }
-    setImportCode('');
-    notify('Data imported — reload to see changes', 'success');
   };
 
   const { user, signOut } = useAuthContext();
@@ -350,50 +303,6 @@ export function Settings() {
           </div>
         </Card>
 
-        {/* ── Share Data ────────────────────────────────────────────────── */}
-        <Card title="Share Data">
-          <div className="space-y-2">
-            <ActionButton
-              icon={<I.Copy width={16} height={16} />}
-              label="Copy sync code"
-              onClick={handleCopyCode}
-              aria-label="Copy sync code"
-            />
-            <ActionButton
-              icon={<I.Share width={16} height={16} />}
-              label="Share sync code"
-              onClick={handleShareCode}
-              aria-label="Share sync code"
-            />
-            <ActionButton
-              icon={<I.QR width={16} height={16} />}
-              label="Show QR code"
-              onClick={handleShowQR}
-              aria-label="Show QR code"
-            />
-          </div>
-          <div className="mt-3">
-            <textarea
-              value={importCode}
-              onChange={(e) => setImportCode(e.target.value)}
-              placeholder="Paste sync code here…"
-              className="w-full border border-sand rounded-xl px-3 py-2 text-xs font-semibold text-bark
-                focus:outline-none focus:ring-2 focus:ring-sage/40 bg-cream resize-none"
-              rows={3}
-              aria-label="Paste sync code"
-            />
-            <button
-              onClick={handleImportCode}
-              disabled={!importCode.trim()}
-              className="w-full mt-2 py-2.5 rounded-xl bg-sage text-white text-sm font-bold
-                hover:opacity-90 transition-opacity disabled:opacity-40"
-              aria-label="Import sync code"
-            >
-              Import Code
-            </button>
-          </div>
-        </Card>
-
         {/* ── Install ───────────────────────────────────────────────────── */}
         {installPrompt && (
           <Card title="Install App">
@@ -473,28 +382,6 @@ export function Settings() {
         onConfirm={() => { confirmAct?.(); setConfirmAct(null); }}
         onClose={() => { setConfirmOpen(false); setConfirmAct(null); }}
       />
-
-      {/* ── QR Modal ────────────────────────────────────────────────────── */}
-      {qrOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-bark/40"
-          onClick={() => setQrOpen(false)}
-        >
-          <div
-            className="card p-6 flex flex-col items-center gap-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-sm font-bold text-bark">Scan to sync</h3>
-            <QRCanvas data={qrCode} size={220} />
-            <button
-              onClick={() => setQrOpen(false)}
-              className="text-xs font-semibold text-bark/50 hover:text-bark"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
 
     </div>
   );
