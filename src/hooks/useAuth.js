@@ -51,48 +51,53 @@ export function useAuth() {
     let subscription;
 
     async function init() {
-      // Capture hash BEFORE getSession() — Supabase cleans it
-      const hash = window.location.hash;
+      try {
+        // Capture hash BEFORE getSession() — Supabase cleans it
+        const hash = window.location.hash;
 
-      // Check for email confirmation (signup or email_change)
-      if (hash.includes('type=signup') || hash.includes('type=email_change')) {
-        emailConfirmedRef.current = true;
-        await supabase.auth.signOut();
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-
-      // Check for password recovery
-      if (hash.includes('type=recovery')) {
-        passwordRecoveryRef.current = true;
-        // Do NOT sign out — user needs the recovery session
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
-
-      // Restore existing session
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      if (currentSession) {
-        setSession(currentSession);
-        setUser(currentSession.user);
-      }
-
-      // Listen for auth state changes
-      const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
-        // Guard: skip updates when emailConfirmed or passwordRecovery is true
-        if (emailConfirmedRef.current || passwordRecoveryRef.current) {
-          return;
+        // Check for email confirmation (signup or email_change)
+        if (hash.includes('type=signup') || hash.includes('type=email_change')) {
+          emailConfirmedRef.current = true;
+          await supabase.auth.signOut();
+          history.replaceState(null, '', window.location.pathname + window.location.search);
         }
 
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          setSession(newSession);
-          setUser(newSession?.user ?? null);
-        } else if (event === 'SIGNED_OUT') {
-          setSession(null);
-          setUser(null);
+        // Check for password recovery
+        if (hash.includes('type=recovery')) {
+          passwordRecoveryRef.current = true;
+          // Do NOT sign out — user needs the recovery session
+          history.replaceState(null, '', window.location.pathname + window.location.search);
         }
-      });
 
-      subscription = data.subscription;
-      setLoading(false);
+        // Restore existing session
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        if (currentSession) {
+          setSession(currentSession);
+          setUser(currentSession.user);
+        }
+
+        // Listen for auth state changes
+        const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
+          // Guard: skip updates when emailConfirmed or passwordRecovery is true
+          if (emailConfirmedRef.current || passwordRecoveryRef.current) {
+            return;
+          }
+
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+            setSession(newSession);
+            setUser(newSession?.user ?? null);
+          } else if (event === 'SIGNED_OUT') {
+            setSession(null);
+            setUser(null);
+          }
+        });
+
+        subscription = data.subscription;
+      } catch (err) {
+        console.error('Auth init failed:', err);
+      } finally {
+        setLoading(false);
+      }
     }
 
     init();
