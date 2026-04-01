@@ -4,9 +4,11 @@
  */
 import React, { useState, useRef, lazy, Suspense } from 'react';
 import { useAppDataContext } from '../hooks/useAppData.js';
+import { useAuthContext } from '../components/AuthProvider.jsx';
 import { useDesk } from '../hooks/useResponsive.js';
 import { S } from '../lib/storage.js';
 import { dlFile, notify, shareItem, PRESETS, encodeSync, decodeSync } from '../lib/utils.js';
+import { pushKey, SYNCED_KEYS } from '../lib/sync.js';
 import { QRCanvas } from '../components/QRCanvas.jsx';
 import { I } from '../components/icons.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
@@ -119,6 +121,14 @@ export function Settings() {
       try {
         const data = JSON.parse(ev.target.result);
         await S.imp(data);
+        // Push imported data to Supabase so it's synced
+        if (user) {
+          for (const key of SYNCED_KEYS) {
+            if (data[key] !== undefined) {
+              await pushKey(user.id, key, data[key]);
+            }
+          }
+        }
         notify('Data restored — reload to see changes', 'success');
       } catch { notify('Import failed — invalid file', 'error'); }
     };
@@ -176,8 +186,22 @@ export function Settings() {
     const obj = decodeSync(importCode.trim());
     if (!obj) { notify('Invalid sync code', 'error'); return; }
     await S.imp(obj);
+    // Push imported data to Supabase
+    if (user) {
+      for (const key of SYNCED_KEYS) {
+        if (obj[key] !== undefined) {
+          await pushKey(user.id, key, obj[key]);
+        }
+      }
+    }
     setImportCode('');
     notify('Data imported — reload to see changes', 'success');
+  };
+
+  const { user, signOut } = useAuthContext();
+
+  const handleLogout = async () => {
+    await signOut();
   };
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -189,6 +213,22 @@ export function Settings() {
       </div>
 
       <div className={`p-4 ${isDesk ? 'grid grid-cols-2 gap-6 items-start' : 'space-y-6'}`}>
+
+        {/* ── Account ──────────────────────────────────────────────────── */}
+        <Card title="Account">
+          <div className="space-y-2">
+            <div className="px-4 py-3 rounded-xl bg-cream border border-sand">
+              <p className="text-xs font-semibold text-bark/50">Signed in as</p>
+              <p className="text-sm font-bold text-bark">{user?.email}</p>
+            </div>
+            <ActionButton
+              icon={<I.Dots width={16} height={16} />}
+              label="Log out"
+              onClick={handleLogout}
+              danger
+            />
+          </div>
+        </Card>
 
         {/* ── Theme ─────────────────────────────────────────────────────── */}
         <Card title="Theme">

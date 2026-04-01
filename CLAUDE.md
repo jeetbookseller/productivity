@@ -4,7 +4,7 @@ This file gives Claude Code context for working on Productivity Hub.
 
 ## Project Overview
 
-Productivity Hub is an offline-first Progressive Web App (PWA) that combines six productivity methodologies into a single browser-based tool. There is no backend — all data lives in the user's browser (IndexedDB + localStorage). The app is deployed as a static site to GitHub Pages.
+Productivity Hub is a Progressive Web App (PWA) that combines six productivity methodologies into a single browser-based tool. **Authentication is required** — the app uses Supabase for auth and data storage. Local storage (IndexedDB + localStorage) serves as a performance cache; Supabase is the source of truth. The app is deployed as a static site to GitHub Pages.
 
 Live URL: https://jeetbookseller.github.io/productivity/
 
@@ -29,14 +29,15 @@ All application state lives in `src/hooks/useAppData.js`, which exposes a React 
 
 ### Persistence
 
-`src/hooks/usePersistedState.js` implements a dual-layer strategy:
+`src/hooks/usePersistedState.js` implements a three-layer strategy:
 
-- **localStorage** — synchronous, used for instant first-render hydration.
-- **IndexedDB** — async truth source (`src/lib/storage.js`), debounced writes at 300 ms. On mount, IndexedDB overwrites localStorage when a stored value is present.
+- **localStorage** — synchronous, used for instant first-render hydration (cache).
+- **IndexedDB** — async local cache (`src/lib/storage.js`), debounced writes at 300 ms.
+- **Supabase** — source of truth (`src/lib/sync.js`), debounced writes at 2 s. On mount, Supabase data is pulled and merged with local cache.
 
 Do not bypass this hook for persistent state.
 
-**Planned: Supabase sync layer** — see "Planned Work" section below. When implemented, `usePersistedState` will push to Supabase (debounced 2s) on every write and pull+merge on mount when the user is signed in. Sync is opt-in; the offline-first path remains unchanged for unauthenticated users.
+The app requires authentication. `App.jsx` renders `AuthForm` when no session exists; `AppDataProvider` only mounts when the user is authenticated, so `usePersistedState` can safely assume a logged-in user for sync operations.
 
 ### Routing
 
@@ -63,12 +64,17 @@ Tailwind CSS 3 with a custom palette defined in `tailwind.config.js` (sage, terr
 
 | Path | Role |
 |------|------|
-| `src/App.jsx` | Root component — nav, theme, tab routing |
+| `src/App.jsx` | Root component — auth gate, nav, theme, tab routing |
 | `src/main.jsx` | React DOM entry point |
 | `src/hooks/useAppData.js` | All application state and CRUD logic |
-| `src/hooks/usePersistedState.js` | Dual-layer (localStorage + IndexedDB) persistence |
+| `src/hooks/usePersistedState.js` | Three-layer persistence (localStorage + IndexedDB + Supabase) |
+| `src/hooks/useAuth.js` | Auth state hook — session, hash detection, sign-in/up/out, password reset |
 | `src/lib/storage.js` | IndexedDB and localStorage wrapper |
+| `src/lib/supabase.js` | Supabase client initialization |
+| `src/lib/sync.js` | Supabase push/pull/merge logic for synced keys |
 | `src/lib/utils.js` | Shared utilities (uid, share, notifications, download) |
+| `src/components/AuthProvider.jsx` | React context wrapper for auth state |
+| `src/components/AuthForm.jsx` | Full-screen auth form (login, signup, forgot, reset password) |
 | `src/components/icons.jsx` | SVG icon components — add new icons here |
 | `public/sw.js` | Service worker (cache-first) |
 | `vite.config.js` | Build config, base path `/productivity/`, Vitest config |
@@ -98,80 +104,87 @@ The Vite base path is `/productivity/` — required for GitHub Pages subdirector
 
 ## Conventions
 
-- **No backend** beyond Supabase sync (opt-in, see Planned Work). All features must work without an account.
-- **No new dependencies** without a clear need. Exception: `@supabase/supabase-js` is approved for the sync feature.
+- **Authentication required.** The app shows a full-screen auth form until the user signs in. No anonymous/local-only usage.
+- **Supabase is the data backend.** `@supabase/supabase-js` is the only external runtime dependency beyond React.
+- **No new dependencies** without a clear need.
 - **No CSS frameworks** beyond Tailwind. Do not add CSS-in-JS libraries.
 - **No client-side router.** Tab state is managed in `App.jsx`.
 - Use the existing `uid()` helper from `src/lib/utils.js` for generating IDs.
 - Context menus use a 3-dot button and right-click; do not add long-press or swipe gestures.
 - Bulk-select mode is triggered by the section header checkbox — keep this pattern consistent across sections.
+- **Data import compatibility:** The JSON export format from the pre-Supabase version of the app must be importable. The Settings import handler should accept the old format and push imported data to Supabase.
 
 ---
 
-## Planned Work: Supabase Cross-Device Sync
+## Authentication
 
-**Goal:** Optional cloud sync so signed-in users can access their data across devices. Offline-first behavior is preserved for all unauthenticated users.
+**Provider:** Supabase Auth (email/password only, no OAuth).
 
-### New files to create
+### Auth Architecture
 
-| File | Purpose |
-|------|---------|
-| `src/lib/supabase.js` | Supabase client + module-level session cache (`currentUser`) |
-| `src/hooks/useAuth.js` | Auth state hook (session, user, signInWithEmail, signInWithMagicLink, signInWithOAuth, signOut) |
-| `src/components/AuthProvider.jsx` | React context wrapper for auth state |
-| `src/lib/sync.js` | `pushKey(userId, key, value)`, `pullAll(userId, keys)`, `mergeValues(key, local, remote)` |
-| `supabase/schema.sql` | `user_data` table + RLS policies SQL script |
-| `.env.example` | Template: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` |
-
-### Files to modify
-
-| File | Change |
-|------|--------|
-| `src/hooks/usePersistedState.js` | Debounced `pushKey` on write; `pullAll` + merge on mount |
-| `src/sections/Settings.jsx` | "Sync & Account" section: email/password form, magic link, OAuth buttons (Google/GitHub), sync status |
-| `src/App.jsx` | Wrap `AppDataProvider` with `AuthProvider` |
-| `package.json` | Add `@supabase/supabase-js` |
-
-### Supabase DB schema
-
-```sql
-create table user_data (
-  user_id    uuid references auth.users not null,
-  key        text not null,
-  value      jsonb not null,
-  updated_at timestamptz default now() not null,
-  primary key (user_id, key)
-);
-alter table user_data enable row level security;
-create policy "Users manage own data" on user_data for all
-  using (auth.uid() = user_id) with check (auth.uid() = user_id);
+```
+App.jsx loads → AuthProvider → if no session → AuthForm (full screen)
+                             → if session → AppDataProvider → all tabs
 ```
 
-Enable in Supabase dashboard: Email (password + magic link), Google OAuth, GitHub OAuth.
+`AuthProvider` wraps the entire app. `AppDataProvider` only mounts when authenticated.
 
-### Keys synced (11 of 13)
+### Auth Features
 
-Synced: `todos`, `notes`, `lists`, `focus`, `theme`, `preset`, `customT`, `poms`, `met`, `dHist`, `fHist`, `seenAbout`
+1. **Email/password login** — `signInWithPassword`, error display, loading spinner
+2. **Email/password signup** — client-side password validation (15 chars, lowercase, uppercase, digit, symbol), confirm password, enumeration protection (`identities.length === 0`), email confirmation flow
+3. **Email confirmation detection** — captures `window.location.hash` before Supabase cleans it; detects `type=signup` → signs out, shows "Email confirmed" banner
+4. **Forgot password** — `resetPasswordForEmail` with `redirectTo` for GitHub Pages
+5. **Password reset** — detects `type=recovery` in hash → shows "Set new password" form with same validation as signup → `updateUser({ password })` → signs out
+6. **Logout** — `signOut()`, available from Settings tab
+7. **Session persistence** — `getSession()` on load, `onAuthStateChange` listener with guards for `emailConfirmed` / `passwordRecovery` flags
 
-Excluded (device-specific/ephemeral): `tab`, `focusTimerState`
+### Auth Files
 
-### Merge logic
+| File | Role |
+|------|------|
+| `src/lib/supabase.js` | `createClient(url, anonKey)` from env vars |
+| `src/hooks/useAuth.js` | All auth logic: init, hash detection, sign-in/up/out, password reset, `onAuthStateChange` guards |
+| `src/components/AuthProvider.jsx` | React context wrapper exposing `useAuthContext()` |
+| `src/components/AuthForm.jsx` | Full-screen form with 4 modes: `login`, `signup`, `forgot`, `reset` |
 
-- **Arrays with `id` field** (`todos`, `notes`, `lists`, `dHist`, `fHist`): union by `id`; remote wins for same-ID conflicts; local-only items preserved (offline additions survive)
+---
+
+## Data Sync
+
+### Supabase DB Schema
+
+```sql
+CREATE TABLE user_data (
+  user_id    uuid REFERENCES auth.users NOT NULL,
+  key        text NOT NULL,
+  value      jsonb NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL,
+  PRIMARY KEY (user_id, key)
+);
+ALTER TABLE user_data ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users manage own data" ON user_data
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+```
+
+### Sync Module (`src/lib/sync.js`)
+
+- `pushKey(userId, key, value)` — upsert single key to `user_data`
+- `pullAll(userId, keys)` — fetch all rows for user
+- `mergeValues(key, local, remote)` — merge strategy per key type
+
+### Keys Synced (11 of 14)
+
+Synced: `todos`, `notes`, `lists`, `focus`, `theme`, `preset`, `customT`, `poms`, `met`, `dHist`, `fHist`
+
+Excluded (device-specific): `tab`, `focusTimerState`, `seenAbout`
+
+### Merge Logic
+
+- **Arrays with `id` field** (`todos`, `notes`, `lists`, `dHist`, `fHist`): union by `id`; remote wins for same-ID conflicts
 - **`focus`** (array of IDs): union, deduplicated, capped at 5
-- **Scalars** (`theme`, `preset`, `customT`, `poms`, `met`, `seenAbout`): remote wins
+- **Scalars** (`theme`, `preset`, `customT`, `poms`, `met`): remote wins
 
-### Implementation phases (can be parallelised)
+### Environment Variables
 
-**Phase 1 — Foundation (3 tasks in parallel):**
-- P1-A: `supabase/schema.sql`, `.env.example`
-- P1-B: `src/lib/supabase.js`, `src/hooks/useAuth.js`, `src/components/AuthProvider.jsx`
-- P1-C: `src/lib/sync.js`
-
-**Phase 2 — Integration (2 tasks in parallel, after Phase 1):**
-- P2-A: Modify `src/hooks/usePersistedState.js`
-- P2-B: Auth + sync UI in `src/sections/Settings.jsx`
-
-**Phase 3 — Wire-up & Tests (after Phase 2):**
-- P3-A: Wire `AuthProvider` in `src/App.jsx`, `npm install @supabase/supabase-js`
-- P3-B: Tests — add auth/sync tests, verify all 45 existing tests still pass
+Requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set in environment (or `.env.local`). See `.env.example`.
