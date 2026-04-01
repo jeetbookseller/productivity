@@ -5,6 +5,8 @@
  */
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppDataProvider } from './components/AppDataProvider.jsx';
+import { AuthProvider, useAuthContext } from './components/AuthProvider.jsx';
+import AuthForm from './components/AuthForm.jsx';
 import { useAppDataContext } from './hooks/useAppData.js';
 import { useWide } from './hooks/useResponsive.js';
 import { I } from './components/icons.jsx';
@@ -183,10 +185,22 @@ function AppShell() {
 
 // ── App ───────────────────────────────────────────────────────────────────────
 
-export default function App() {
+function AuthGate() {
+  const { user } = useAuthContext();
+
+  if (!user) return <AuthForm />;
+
   return (
     <AppDataProvider>
       <AppShell />
     </AppDataProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AuthGate />
+    </AuthProvider>
   );
 }
