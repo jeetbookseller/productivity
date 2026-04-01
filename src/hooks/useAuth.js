@@ -17,7 +17,13 @@ export function useAuth() {
 
   const signUp = useCallback(async (email, password) => {
     if (!supabase) return { data: null, error: { message: 'Auth service is not configured.' } };
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.origin + window.location.pathname,
+      },
+    });
     if (data?.user?.identities?.length === 0) {
       return { data, error: { message: 'An account with this email already exists. Please sign in instead.' } };
     }
