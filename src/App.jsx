@@ -3,7 +3,7 @@
  * Provides AppDataContext, ThemeProv, tab routing, nav (mobile bottom bar /
  * desktop sidebar), About modal, and live timer badge.
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { AppDataProvider } from './components/AppDataProvider.jsx';
 import { AuthProvider, useAuthContext } from './components/AuthProvider.jsx';
 import AuthForm from './components/AuthForm.jsx';
@@ -11,6 +11,7 @@ import { useAppDataContext } from './hooks/useAppData.js';
 import { useWide } from './hooks/useResponsive.js';
 import { I } from './components/icons.jsx';
 import { AboutModal } from './components/AboutModal.jsx';
+import { usePullToRefresh } from './hooks/usePullToRefresh.js';
 
 import { Capture  } from './sections/Capture.jsx';
 import { Clarify  } from './sections/Clarify.jsx';
@@ -102,10 +103,15 @@ function NavButton({ tabKey, label, Icon, active, onClick, showTimerBadge, timer
 
 // ── AppShell ─────────────────────────────────────────────────────────────────
 
+// THRESHOLD must match the value in usePullToRefresh.js
+const PTR_THRESHOLD = 64;
+
 function AppShell() {
   const { tab, setTab, seenAbout, setSeenAbout, timerState } = useAppDataContext();
   const [showAbout, setShowAbout] = useState(() => !seenAbout);
   const isWide = useWide();
+  const mainRef = useRef(null);
+  const { pullY, refreshing } = usePullToRefresh(mainRef, () => window.location.reload());
 
   const closeAbout = () => {
     setShowAbout(false);
@@ -165,8 +171,23 @@ function AppShell() {
         </div>
       ) : (
         /* ── Mobile: bottom tab bar layout ───────────────────────────────── */
-        <div className="flex flex-col h-[100dvh] bg-cream">
-          <main className="flex-1 overflow-y-auto min-h-0">
+        <div className="flex flex-col h-[100dvh] bg-cream relative overflow-hidden">
+          {/* Pull-to-refresh indicator */}
+          <div
+            aria-hidden="true"
+            className="absolute left-0 right-0 flex justify-center z-40 pointer-events-none"
+            style={{ top: 0, transform: `translateY(${(refreshing ? PTR_THRESHOLD : pullY) - 48}px)` }}
+          >
+            <div className="bg-surface rounded-full shadow-md p-2 mt-1 border border-sand">
+              <I.Reset
+                width={16}
+                height={16}
+                className={refreshing ? 'text-sage animate-spin' : 'text-bark/50'}
+                style={refreshing ? undefined : { transform: `rotate(${(pullY / PTR_THRESHOLD) * 360}deg)` }}
+              />
+            </div>
+          </div>
+          <main ref={mainRef} className="flex-1 overflow-y-auto min-h-0">
             <ActiveSection />
           </main>
           <nav
