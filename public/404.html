@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Productivity Hub</title>
+  <script>
+    // GitHub Pages serves this file for any path it can't find.
+    // Supabase auth redirects can land here when the project's "Site URL"
+    // doesn't include the /productivity/ sub-path.
+    // We preserve the hash (which carries Supabase auth tokens like
+    // #access_token=...&type=signup) and forward to the real app root.
+    sessionStorage.setItem('spa_redirect_hash', window.location.hash);
+    window.location.replace('/productivity/');
+  </script>
+</head>
+<body></body>
+</html>
