@@ -374,6 +374,8 @@ export function Settings() {
 
       </div>
 
+      <p className="text-center text-xs font-semibold text-bark/30 py-4">v{__APP_VERSION__}</p>
+
       <ConfirmDialog
         open={confirmOpen}
         message={confirmMsg}
