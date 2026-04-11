@@ -8,7 +8,8 @@ function appVersion() {
   try {
     const { version } = JSON.parse(readFileSync('./package.json', 'utf8'));
     const [major, minor] = version.split('.');
-    const patch = execSync('git rev-list --count HEAD').toString().trim();
+    const patch = process.env.GITHUB_RUN_NUMBER
+      || execSync('git rev-list --count HEAD').toString().trim();
     return `${major}.${minor}.${patch}`;
   } catch {
     return '0.0.0';
