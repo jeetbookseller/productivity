@@ -3,7 +3,6 @@
  * Theme, timer presets, data management, PWA install, explainer accordion, TestRunner.
  */
 import React, { useState, useRef, lazy, Suspense } from 'react';
-import { version } from '../../package.json';
 import { useAppDataContext } from '../hooks/useAppData.js';
 import { useAuthContext } from '../components/AuthProvider.jsx';
 import { useDesk } from '../hooks/useResponsive.js';
@@ -375,7 +374,7 @@ export function Settings() {
 
       </div>
 
-      <p className="text-center text-xs font-semibold text-bark/30 py-4">v{version}</p>
+      <p className="text-center text-xs font-semibold text-bark/30 py-4">v{__APP_VERSION__}</p>
 
       <ConfirmDialog
         open={confirmOpen}
