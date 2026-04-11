@@ -21,7 +21,7 @@ export function useAuth() {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin + window.location.pathname,
+        emailRedirectTo: window.location.origin + import.meta.env.BASE_URL,
       },
     });
     if (data?.user?.identities?.length === 0) {
@@ -33,7 +33,7 @@ export function useAuth() {
   const resetPasswordForEmail = useCallback(async (email) => {
     if (!supabase) return { data: null, error: { message: 'Auth service is not configured.' } };
     const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + window.location.pathname,
+      redirectTo: window.location.origin + import.meta.env.BASE_URL,
     });
     return { data, error };
   }, []);
