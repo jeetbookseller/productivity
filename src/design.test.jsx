@@ -43,7 +43,7 @@ function mkCtx(overrides = {}) {
     setTheme: vi.fn(), setPreset: vi.fn(),
     addNote: vi.fn(), editNote: vi.fn(), deleteNote: vi.fn(),
     strikeNote: vi.fn(), promoteNote: vi.fn(),
-    bulkDeleteNotes: vi.fn(), bulkStrikeNotes: vi.fn(), clearStruckNotes: vi.fn(),
+    bulkDeleteNotes: vi.fn(), bulkStrikeNotes: vi.fn(), clearStruckNotes: vi.fn(), migrateNotes: vi.fn(),
     addTodo: vi.fn(), editTodo: vi.fn(), deleteTodo: vi.fn(),
     toggleTodo: vi.fn(), moveTodo: vi.fn(), reorderTodo: vi.fn(),
     addSubtask: vi.fn(), editSubtask: vi.fn(), deleteSubtask: vi.fn(), toggleSubtask: vi.fn(),

@@ -62,8 +62,9 @@ export function useAppData() {
 
   // ── Notes (Capture) ──────────────────────────────────────────────────────────
 
-  const addNote = (text) => {
-    const note = { id: uid(), text, crAt: new Date().toISOString(), struck: false, struckAt: null };
+  const addNote = (text, date) => {
+    const d = date || new Date().toISOString().slice(0, 10);
+    const note = { id: uid(), text, crAt: new Date().toISOString(), struck: false, struckAt: null, date: d };
     setNotes((prev) => [note, ...prev]);
     return note;
   };
@@ -107,6 +108,17 @@ export function useAppData() {
     setNotes((prev) => prev.filter((n) =>
       !n.struck || (n.struckAt && new Date(n.struckAt).getTime() > cutoff)
     ));
+  };
+
+  const migrateNotes = () => {
+    const today = new Date().toISOString().slice(0, 10);
+    setNotes((prev) => prev.map((n) => {
+      const noteDate = n.date || n.crAt.slice(0, 10);
+      if (noteDate < today && !n.struck) {
+        return { ...n, date: today };
+      }
+      return n.date ? n : { ...n, date: noteDate };
+    }));
   };
 
   // ── Todos (Clarify) ──────────────────────────────────────────────────────────
@@ -321,7 +333,7 @@ export function useAppData() {
 
     // Notes (Capture)
     addNote, editNote, deleteNote, strikeNote, promoteNote,
-    bulkDeleteNotes, bulkStrikeNotes, clearStruckNotes,
+    bulkDeleteNotes, bulkStrikeNotes, clearStruckNotes, migrateNotes,
 
     // Todos (Clarify)
     addTodo, editTodo, deleteTodo, toggleTodo, moveTodo, reorderTodo,
