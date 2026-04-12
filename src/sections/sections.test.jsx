@@ -46,7 +46,7 @@ function mkCtx(overrides = {}) {
     // Notes
     addNote: vi.fn(), editNote: vi.fn(), deleteNote: vi.fn(),
     strikeNote: vi.fn(), promoteNote: vi.fn(),
-    bulkDeleteNotes: vi.fn(), bulkStrikeNotes: vi.fn(), clearStruckNotes: vi.fn(),
+    bulkDeleteNotes: vi.fn(), bulkStrikeNotes: vi.fn(), clearStruckNotes: vi.fn(), migrateNotes: vi.fn(),
     // Todos
     addTodo: vi.fn(), editTodo: vi.fn(), deleteTodo: vi.fn(),
     toggleTodo: vi.fn(), moveTodo: vi.fn(), reorderTodo: vi.fn(),
@@ -78,8 +78,9 @@ function wrap(ui, ctx = mkCtx()) {
 // ── 4a: Capture ───────────────────────────────────────────────────────────────
 
 describe('Capture', () => {
-  const NOTE1 = { id: 'n1', text: 'Hello world', crAt: new Date().toISOString(), struck: false, struckAt: null };
-  const NOTE2 = { id: 'n2', text: 'Struck note', crAt: new Date().toISOString(), struck: true, struckAt: new Date().toISOString() };
+  const TODAY = new Date().toISOString().slice(0, 10);
+  const NOTE1 = { id: 'n1', text: 'Hello world', crAt: new Date().toISOString(), struck: false, struckAt: null, date: TODAY };
+  const NOTE2 = { id: 'n2', text: 'Struck note', crAt: new Date().toISOString(), struck: true, struckAt: new Date().toISOString(), date: TODAY };
 
   it('4a-1: renders notes from context', () => {
     wrap(<Capture />, mkCtx({ notes: [NOTE1, NOTE2] }));
@@ -87,19 +88,21 @@ describe('Capture', () => {
     expect(screen.getByText('Struck note')).toBeTruthy();
   });
 
-  it('4a-2: QuickAdd calls addNote on Enter', () => {
+  it('4a-2: QuickAdd calls addNote on Enter with today date', () => {
     const addNote = vi.fn();
     wrap(<Capture />, mkCtx({ addNote }));
     const input = screen.getByPlaceholderText('Brain-dump anything…');
     fireEvent.change(input, { target: { value: 'New idea' } });
     fireEvent.keyDown(input, { key: 'Enter' });
-    expect(addNote).toHaveBeenCalledWith('New idea');
+    expect(addNote).toHaveBeenCalledWith('New idea', TODAY);
   });
 
-  it('4a-3: clearStruckNotes is called on mount', () => {
+  it('4a-3: clearStruckNotes and migrateNotes are called on mount', () => {
     const clearStruckNotes = vi.fn();
-    wrap(<Capture />, mkCtx({ clearStruckNotes }));
+    const migrateNotes = vi.fn();
+    wrap(<Capture />, mkCtx({ clearStruckNotes, migrateNotes }));
     expect(clearStruckNotes).toHaveBeenCalledTimes(1);
+    expect(migrateNotes).toHaveBeenCalledTimes(1);
   });
 
   it('4a-4: 3-dot menu opens with expected options', () => {
@@ -167,6 +170,20 @@ describe('Capture', () => {
     const confirmBtn = screen.getByText('Delete', { selector: 'button.bg-terracotta' });
     fireEvent.click(confirmBtn);
     expect(bulkDeleteNotes).toHaveBeenCalled();
+  });
+
+  it('4a-12: Today date section header is rendered', () => {
+    wrap(<Capture />, mkCtx({ notes: [NOTE1] }));
+    expect(screen.getByText('Today')).toBeTruthy();
+  });
+
+  it('4a-13: collapsing a date section hides its notes', () => {
+    wrap(<Capture />, mkCtx({ notes: [NOTE1] }));
+    // Today section is expanded by default, note is visible
+    expect(screen.getByText('Hello world')).toBeTruthy();
+    // Collapse today
+    fireEvent.click(screen.getByLabelText('Collapse Today'));
+    expect(screen.queryByText('Hello world')).toBeNull();
   });
 });
 

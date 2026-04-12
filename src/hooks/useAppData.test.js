@@ -73,13 +73,13 @@ describe('useAppData — state fields', () => {
     const { result } = renderHook(() => useAppData());
     const d = result.current;
     ['addNote','editNote','deleteNote','strikeNote','promoteNote',
-     'bulkDeleteNotes','bulkStrikeNotes','clearStruckNotes']
+     'bulkDeleteNotes','bulkStrikeNotes','clearStruckNotes','migrateNotes']
       .forEach((fn) => expect(typeof d[fn]).toBe('function'));
   });
 });
 
 describe('useAppData — notes (Capture)', () => {
-  it('T1-8: addNote creates a note with correct shape', () => {
+  it('T1-8: addNote creates a note with correct shape including date', () => {
     const { result } = renderHook(() => useAppData());
     act(() => { result.current.addNote('hello world'); });
     const note = result.current.notes[0];
@@ -87,6 +87,24 @@ describe('useAppData — notes (Capture)', () => {
     expect(typeof note.id).toBe('string');
     expect(note.struck).toBe(false);
     expect(typeof note.crAt).toBe('string');
+    expect(note.date).toBe(new Date().toISOString().slice(0, 10));
+  });
+
+  it('T1-8b: migrateNotes moves past non-struck notes to today', () => {
+    const { result } = renderHook(() => useAppData());
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yStr = yesterday.toISOString().slice(0, 10);
+    const todayStr = new Date().toISOString().slice(0, 10);
+    // Add two notes: one not struck (should migrate), one struck (should stay)
+    act(() => { result.current.addNote('active', yStr); });
+    act(() => { result.current.addNote('done', yStr); });
+    act(() => { result.current.strikeNote(result.current.notes[0].id); });
+    act(() => { result.current.migrateNotes(); });
+    const active = result.current.notes.find((n) => n.text === 'active');
+    const done = result.current.notes.find((n) => n.text === 'done');
+    expect(active.date).toBe(todayStr); // non-struck note migrated to today
+    expect(done.date).toBe(yStr); // struck note stays on old date
   });
 
   it('T1-9: deleteNote removes the note by id', () => {
