@@ -4,9 +4,6 @@ export default {
   darkMode: ['selector', '[data-theme="dark"]'],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Nunito', 'sans-serif'],
-      },
       colors: {
         sage: 'rgb(var(--sage) / <alpha-value>)',
         terracotta: 'rgb(var(--terracotta) / <alpha-value>)',
