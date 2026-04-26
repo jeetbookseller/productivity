@@ -11,8 +11,11 @@ import { StickyHeader } from '../components/StickyHeader.jsx';
 import { BulkActionBar } from '../components/BulkActionBar.jsx';
 import { ContextMenu } from '../components/ContextMenu.jsx';
 import { ConfirmDialog } from '../components/ConfirmDialog.jsx';
+import { SendToJournalPicker } from '../components/SendToJournalPicker.jsx';
 import { I } from '../components/icons.jsx';
 import { shareItem } from '../lib/utils.js';
+import { sendToFrictionJournal } from '../lib/sendToFrictionJournal.js';
+import { useAuthContext } from '../components/AuthProvider.jsx';
 
 // ── Date helpers ─────────────────────────────────────────────────────────────
 
@@ -63,10 +66,11 @@ function formatDateLabel(dateStr) {
 
 export function Capture() {
   const {
-    notes, addNote, editNote, deleteNote, strikeNote, promoteNote,
+    notes, addNote, editNote, deleteNote, strikeNote, promoteNote, stampNote,
     bulkDeleteNotes, bulkStrikeNotes, clearStruckNotes, migrateNotes,
   } = useAppDataContext();
   const isDesk = useDesk();
+  const { session } = useAuthContext();
 
   // Inline edit
   const [editingId, setEditingId]   = useState(null);
@@ -82,6 +86,12 @@ export function Capture() {
   const [confirmOpen,   setConfirmOpen]   = useState(false);
   const [confirmMsg,    setConfirmMsg]    = useState('');
   const [pendingDelete, setPendingDelete] = useState(null);
+
+  // Send to Journal picker
+  const [pickerOpen,   setPickerOpen]   = useState(false);
+  const [pickerNote,   setPickerNote]   = useState(null);
+  const [pickerAnchor, setPickerAnchor] = useState(null);
+  const [sendingId,    setSendingId]    = useState(null);
 
   // Bulk select
   const [bulkMode, setBulkMode] = useState(false);
@@ -153,6 +163,24 @@ export function Capture() {
     setMenuAnchor(null);
   }, []);
 
+  const handleSendToJournal = async (tag) => {
+    setPickerOpen(false);
+    if (!pickerNote || !session) return;
+    setSendingId(pickerNote.id);
+
+    const result = await sendToFrictionJournal(pickerNote, tag, session.user.id);
+
+    if (result.success) {
+      stampNote(pickerNote.id, { sentToFJ: true, sentToFJAt: Date.now() });
+    } else {
+      window.alert(`Could not send to Journal: ${result.error}`);
+    }
+
+    setSendingId(null);
+    setPickerNote(null);
+    setPickerAnchor(null);
+  };
+
   const menuItems = menuNote ? [
     {
       label: 'Promote to Clarify',
@@ -163,6 +191,17 @@ export function Capture() {
       label: 'Copy text',
       icon: <I.Copy width={15} height={15} />,
       action: () => shareItem(menuNote.text),
+    },
+    {
+      label: menuNote?.sentToFJ ? '✓ Sent to Journal' : 'Send to Journal',
+      icon: <I.ExternalLink width={15} height={15} />,
+      disabled: !!menuNote?.sentToFJ,
+      action: () => {
+        setPickerNote(menuNote);
+        setPickerAnchor(menuAnchor);
+        setPickerOpen(true);
+        closeMenu();
+      },
     },
     {
       label: menuNote.struck ? 'Unstrike' : 'Strikethrough',
@@ -384,6 +423,13 @@ export function Capture() {
         }}
         onClose={() => { setConfirmOpen(false); setPendingDelete(null); }}
       />
+
+      <SendToJournalPicker
+        open={pickerOpen}
+        anchorRect={pickerAnchor}
+        onSelect={handleSendToJournal}
+        onClose={() => { setPickerOpen(false); setPickerNote(null); }}
+      />
     </div>
   );
 }
@@ -493,6 +539,11 @@ function NoteRow({
           </span>
         )}
       </div>
+
+      {/* Sent to Journal badge */}
+      {note.sentToFJ && !bulkMode && (
+        <span className="flex-shrink-0 text-xs font-medium text-sage/70">✓ Journal</span>
+      )}
 
       {/* 3-dot menu */}
       {!bulkMode && (
