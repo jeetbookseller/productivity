@@ -284,6 +284,27 @@ function Pause({ width = 18, height = 18, ...props }) {
   );
 }
 
+function ExternalLink({ width = 18, height = 18, ...props }) {
+  return (
+    <svg viewBox="0 0 24 24" width={width} height={height} fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+      <polyline points="15 3 21 3 21 9" />
+      <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  );
+}
+
+function BookOpen({ width = 18, height = 18, ...props }) {
+  return (
+    <svg viewBox="0 0 24 24" width={width} height={height} fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
+      <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+    </svg>
+  );
+}
+
 function Reset({ width = 18, height = 18, ...props }) {
   return (
     <svg viewBox="0 0 24 24" width={width} height={height} fill="none"
@@ -305,4 +326,5 @@ export const I = {
   QR, Copy, Download, Upload,
   Info, Strike,
   Timer, Play, Pause, Reset,
+  ExternalLink, BookOpen,
 };

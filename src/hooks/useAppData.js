@@ -11,7 +11,7 @@
  *   // In any child:
  *   const { todos, addTodo, ... } = useAppDataContext();
  */
-import { createContext, useContext, useRef, useEffect } from 'react';
+import { createContext, useContext, useRef, useEffect, useCallback } from 'react';
 import { usePersistedState } from './usePersistedState.js';
 import { uid } from '../lib/utils.js';
 
@@ -109,6 +109,12 @@ export function useAppData() {
       !n.struck || (n.struckAt && new Date(n.struckAt).getTime() > cutoff)
     ));
   };
+
+  const stampNote = useCallback((id, fields) => {
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, ...fields } : n))
+    );
+  }, [setNotes]);
 
   const migrateNotes = () => {
     const today = new Date().toISOString().slice(0, 10);
@@ -332,7 +338,7 @@ export function useAppData() {
     setTheme, setPreset,
 
     // Notes (Capture)
-    addNote, editNote, deleteNote, strikeNote, promoteNote,
+    addNote, editNote, deleteNote, strikeNote, promoteNote, stampNote,
     bulkDeleteNotes, bulkStrikeNotes, clearStruckNotes, migrateNotes,
 
     // Todos (Clarify)
