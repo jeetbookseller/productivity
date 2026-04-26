@@ -106,6 +106,24 @@ function NavButton({ tabKey, label, Icon, active, onClick, showTimerBadge, timer
 // THRESHOLD must match the value in usePullToRefresh.js
 const PTR_THRESHOLD = 64;
 
+const OTHER_APP_URL =
+  import.meta.env.VITE_OTHER_APP_URL ||
+  'https://jeetbookseller.github.io/friction-journal/';
+
+function PersonalLink() {
+  return (
+    <a
+      href={OTHER_APP_URL}
+      className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-bark/50
+                 hover:text-bark/80 transition-colors rounded-lg hover:bg-cream"
+      aria-label="Open Friction Journal"
+    >
+      <I.BookOpen width={14} height={14} />
+      <span>Personal</span>
+    </a>
+  );
+}
+
 function AppShell() {
   const { tab, setTab, seenAbout, setSeenAbout, timerState } = useAppDataContext();
   const [showAbout, setShowAbout] = useState(() => !seenAbout);
@@ -164,6 +182,9 @@ function AppShell() {
             <nav aria-label="Sidebar navigation" className="flex flex-col gap-0.5">
               {navButtons}
             </nav>
+            <div className="mt-auto pt-2 border-t border-sand">
+              <PersonalLink />
+            </div>
           </aside>
           <main className="flex-1 overflow-y-auto">
             <ActiveSection />
@@ -172,6 +193,13 @@ function AppShell() {
       ) : (
         /* ── Mobile: bottom tab bar layout ───────────────────────────────── */
         <div className="flex flex-col h-[100dvh] bg-cream relative overflow-hidden">
+          <div className="bg-surface border-b border-sand flex items-center justify-between px-3 py-1.5 flex-shrink-0">
+            <div>
+              <p className="text-[9px] font-bold text-bark/40 uppercase tracking-wide leading-none">Productivity</p>
+              <span className="text-xs font-extrabold text-bark leading-none">Hub</span>
+            </div>
+            <PersonalLink />
+          </div>
           {/* Pull-to-refresh indicator */}
           <div
             aria-hidden="true"
