@@ -30,7 +30,7 @@ export function SendToJournalPicker({ open, anchorRect, onSelect, onClose }) {
   return (
     <div
       ref={ref}
-      style={{ position: 'fixed', top: anchorRect.bottom + 4, left: anchorRect.left }}
+      style={{ position: 'fixed', top: anchorRect.bottom + 4, right: window.innerWidth - anchorRect.right }}
       className="z-50 flex gap-1 p-1.5 bg-surface border border-sand rounded-xl shadow-lg"
     >
       <span className="text-xs text-bark/40 self-center pr-1">Send as:</span>
