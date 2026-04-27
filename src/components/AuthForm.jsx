@@ -139,7 +139,11 @@ export default function AuthForm() {
   return (
     <div className="min-h-[100dvh] flex items-center justify-center bg-cream p-4">
       <div className="w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-bark text-center mb-6">Productivity Hub</h1>
+        <div className="mb-8 text-center">
+          <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
+            Productivity Hub - Personal Journal
+          </span>
+        </div>
         <div className="bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm p-6 space-y-4">
 
           {/* ---- Login mode ---- */}
