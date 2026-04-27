@@ -297,12 +297,12 @@ const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, m
   const circ = 2 * Math.PI * r;
   const dash = circ * (1 - progress);
 
-  const modeColor = { work: '#E07A5F', short: '#7CB69D', long: '#5A9BBF' }[mode] || '#7CB69D';
+  const modeColor = { work: '#dc2626', short: '#4f46e5', long: '#2563eb' }[mode] || '#4f46e5';
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#E8DFD0" strokeWidth="8" />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#e2e2ec" strokeWidth="8" />
         <circle
           cx={size / 2} cy={size / 2} r={r}
           fill="none"
