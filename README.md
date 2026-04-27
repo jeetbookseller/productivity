@@ -40,7 +40,7 @@ A personal productivity web app combining multiple proven methodologies into one
 
 ## Technical overview
 
-Productivity Hub is a **static single-page application** with no server component. The entire app ships as pre-built HTML/CSS/JS to GitHub Pages and runs entirely in the browser.
+Productivity Hub is a web app that runs in your browser — there is nothing to install. You visit the URL, log in, and your data is stored in the cloud (Supabase) and synced across your devices. It also works offline after the first visit, with changes syncing automatically when you're back online. The app's own code is pre-built and served as static files from GitHub Pages; Supabase provides the hosted backend for authentication and data storage.
 
 **Architecture.** State is managed centrally in a single React context (`useAppData`) and flows down to six section components. A custom `usePersistedState` hook provides three-layer persistence: writes go to `localStorage` immediately, to IndexedDB on a 300 ms debounce (local cache), and to Supabase on a 2 s debounce (source of truth). On mount, Supabase data is pulled and merged with the local cache.
 
