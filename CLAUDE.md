@@ -4,7 +4,7 @@ This file gives Claude Code context for working on Productivity Hub.
 
 ## Project Overview
 
-Productivity Hub is a Progressive Web App (PWA) that combines six productivity methodologies into a single browser-based tool. **Authentication is required** — the app uses Supabase for auth and data storage. Local storage (IndexedDB + localStorage) serves as a performance cache; Supabase is the source of truth. The app is deployed as a static site to GitHub Pages.
+Productivity Hub is a Progressive Web App (PWA) that combines six productivity methodologies into a single browser-based tool. **Authentication is required** — the app uses Supabase for auth and data storage. Local storage (IndexedDB + localStorage) serves as a performance cache; Supabase is the source of truth. The app is deployed as a static site to GitHub Pages and connects to [Friction Journal](https://jeetbookseller.github.io/friction-journal/) for cross-app journaling.
 
 Live URL: https://jeetbookseller.github.io/productivity/
 
@@ -64,18 +64,20 @@ Tailwind CSS 3 with a custom palette defined in `tailwind.config.js` (sage, terr
 
 | Path | Role |
 |------|------|
-| `src/App.jsx` | Root component — auth gate, nav, theme, tab routing |
+| `src/App.jsx` | Root component — auth gate, nav, theme, tab routing, `Personal` deep-link to Friction Journal |
 | `src/main.jsx` | React DOM entry point |
-| `src/hooks/useAppData.js` | All application state and CRUD logic |
+| `src/hooks/useAppData.js` | All application state and CRUD logic, including `stampNote` for in-place note field updates |
 | `src/hooks/usePersistedState.js` | Three-layer persistence (localStorage + IndexedDB + Supabase) |
 | `src/hooks/useAuth.js` | Auth state hook — session, hash detection, sign-in/up/out, password reset |
 | `src/lib/storage.js` | IndexedDB and localStorage wrapper |
 | `src/lib/supabase.js` | Supabase client initialization |
 | `src/lib/sync.js` | Supabase push/pull/merge logic for synced keys |
 | `src/lib/utils.js` | Shared utilities (uid, share, notifications, download) |
+| `src/lib/sendToFrictionJournal.js` | Inserts a copy of a Capture note into FJ's `rapid_logs` table via shared Supabase client |
 | `src/components/AuthProvider.jsx` | React context wrapper for auth state |
 | `src/components/AuthForm.jsx` | Full-screen auth form (login, signup, forgot, reset password) |
-| `src/components/icons.jsx` | SVG icon components — add new icons here |
+| `src/components/SendToJournalPicker.jsx` | Inline tag picker popover (Note / Event / Mood) for cross-app sends |
+| `src/components/icons.jsx` | SVG icon components — add new icons here (`ExternalLink`, `BookOpen` added) |
 | `public/sw.js` | Service worker (cache-first) |
 | `vite.config.js` | Build config, base path `/productivity/`, Vitest config |
 | `tailwind.config.js` | Custom palette and dark-mode selector |
@@ -187,4 +189,33 @@ Excluded (device-specific): `tab`, `focusTimerState`, `seenAbout`
 
 ### Environment Variables
 
-Requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` set in environment (or `.env.local`). See `.env.example`.
+Requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in `.env.local`. `VITE_OTHER_APP_URL` sets the Friction Journal URL (defaults to `https://jeetbookseller.github.io/friction-journal/`; set to `http://localhost:5174` for local cross-app dev). See `.env.example`.
+
+---
+
+## Cross-App Integration
+
+Productivity Hub shares a Supabase project with Friction Journal. Both apps authenticate with the same credentials and access the same database, so PH can write directly into FJ's `rapid_logs` table (and vice versa) within the bounds of RLS.
+
+### Send to Journal (Capture → Friction Journal)
+
+A **Send to Journal** option in the Capture note context menu copies a note to Friction Journal's Rapid Log.
+
+- User opens the 3-dot menu on any Capture note → **Send to Journal**
+- `SendToJournalPicker` popover appears with three tag pills: **Note**, **Event**, **Mood**
+- On selection, `sendToFrictionJournal(note, tag, userId)` (`src/lib/sendToFrictionJournal.js`) inserts a row into `rapid_logs` using the shared Supabase client
+- On success, `stampNote(id, { sentToFJ: true, sentToFJAt: now })` marks the note — it shows a `✓ Journal` badge and the menu item becomes `✓ Sent to Journal` (disabled)
+- Errors surface inline; the badge is not applied on failure
+
+### Personal Link
+
+A **Personal** button in the app header navigates to Friction Journal (same tab, PWA-style). URL is read from `VITE_OTHER_APP_URL`.
+
+### Cross-App Note Fields
+
+PH notes (stored as JSON blobs in `user_data` under `key='notes'`) carry two optional fields once sent:
+
+| Field | Type | Meaning |
+|-------|------|---------|
+| `sentToFJ` | `boolean` | True once the note has been sent to Friction Journal |
+| `sentToFJAt` | `number` | Epoch ms timestamp of when it was sent |
