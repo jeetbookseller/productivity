@@ -141,7 +141,7 @@ export default function AuthForm() {
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
-            Plan & Journal
+            Productivity Hub - Personal Journal
           </span>
         </div>
         <div className="bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm p-6 space-y-4">
