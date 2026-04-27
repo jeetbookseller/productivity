@@ -1,5 +1,5 @@
 /**
- * Productivity Hub Service Worker
+ * Plan & Journal Service Worker
  * Cache name: productivity-hub-v19
  * Strategy: cache-first with runtime population
  *

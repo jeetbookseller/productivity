@@ -34,7 +34,7 @@ export function AboutModal({ open, onClose }) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-sand flex-shrink-0">
           <div>
-            <h2 className="text-base font-bold text-bark">Productivity Hub</h2>
+            <h2 className="text-base font-bold text-bark">Plan & Journal</h2>
             <p className="text-xs text-bark/50 font-semibold">v2-alpha</p>
           </div>
           <button onClick={onClose} className="text-bark/40 hover:text-bark transition-colors">
@@ -46,7 +46,7 @@ export function AboutModal({ open, onClose }) {
         <div className="overflow-y-auto flex-1">
           <div className="px-5 py-4 space-y-4">
 
-            <p className="text-sm font-bold text-bark">🌿 About Productivity</p>
+            <p className="text-sm font-bold text-bark">🌿 About Plan & Journal</p>
 
             {/* 5 steps */}
             <div className="space-y-3">

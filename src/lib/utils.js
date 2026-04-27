@@ -51,7 +51,7 @@ export async function reqNotifyPerm() {
 
 // ── Web Share with clipboard fallback ─────────────────────────────────────────
 
-export async function shareItem(text, title = 'Productivity Hub') {
+export async function shareItem(text, title = 'Plan & Journal') {
   if (navigator.share) {
     try {
       await navigator.share({ title, text });

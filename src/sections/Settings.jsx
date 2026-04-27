@@ -395,7 +395,7 @@ function WorkflowSection() {
   return (
     <div className="space-y-3">
       <p>
-        Productivity Hub combines the Bullet Journal method, GTD (Getting Things Done),
+        Plan & Journal combines the Bullet Journal method, GTD (Getting Things Done),
         Deep Work, and the Eisenhower Matrix into one seamless workflow. Every productivity
         system follows one cycle — ours has five steps, each mapped to a tab:
       </p>
