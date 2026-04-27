@@ -119,7 +119,7 @@ function PersonalLink() {
       aria-label="Open Friction Journal"
     >
       <I.BookOpen width={14} height={14} />
-      <span>Personal</span>
+      <span>Personal Journal</span>
     </a>
   );
 }
@@ -176,8 +176,9 @@ function AppShell() {
         <div className="flex h-[100dvh] bg-cream overflow-hidden">
           <aside className="w-48 bg-surface border-r border-sand flex flex-col py-4 gap-1 px-2 flex-shrink-0">
             <div className="px-3 pb-4 mb-2 border-b border-sand">
-              <p className="text-[10px] font-bold text-bark/40 uppercase tracking-wide">Productivity</p>
-              <h1 className="text-sm font-extrabold text-bark">Hub</h1>
+              <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
+                Productivity Hub
+              </span>
             </div>
             <nav aria-label="Sidebar navigation" className="flex flex-col gap-0.5">
               {navButtons}
@@ -195,8 +196,9 @@ function AppShell() {
         <div className="flex flex-col h-[100dvh] bg-cream relative overflow-hidden">
           <div className="bg-surface border-b border-sand flex items-center justify-between px-3 py-1.5 flex-shrink-0">
             <div>
-              <p className="text-[9px] font-bold text-bark/40 uppercase tracking-wide leading-none">Productivity</p>
-              <span className="text-xs font-extrabold text-bark leading-none">Hub</span>
+              <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
+                Productivity Hub
+              </span>
             </div>
             <PersonalLink />
           </div>
