@@ -1,13 +1,13 @@
 /**
- * Plan & Journal Service Worker
- * Cache name: productivity-hub-v19
+ * Plan Service Worker
+ * Cache name: productivity-hub-v20
  * Strategy: cache-first with runtime population
  *
  * Standalone file — no ES module imports — for browser SW compatibility.
  * Logic mirrors src/lib/sw-utils.js for testability.
  */
 
-const CACHE_NAME = 'productivity-hub-v19';
+const CACHE_NAME = 'productivity-hub-v20';
 const SHELL = ['/productivity/', '/productivity/index.html'];
 
 // ── Install: pre-cache the app shell ─────────────────────────────────────────
