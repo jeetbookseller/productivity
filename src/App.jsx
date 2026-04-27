@@ -177,7 +177,7 @@ function AppShell() {
           <aside className="w-48 bg-surface border-r border-sand flex flex-col py-4 gap-1 px-2 flex-shrink-0">
             <div className="px-3 pb-4 mb-2 border-b border-sand">
               <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
-                Productivity & Journaling
+                Plan & Journal
               </span>
             </div>
             <nav aria-label="Sidebar navigation" className="flex flex-col gap-0.5">
@@ -197,7 +197,7 @@ function AppShell() {
           <div className="bg-surface border-b border-sand flex items-center justify-between px-3 py-1.5 flex-shrink-0">
             <div>
               <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
-                Productivity & Journaling
+                Plan & Journal
               </span>
             </div>
             <PersonalLink />
