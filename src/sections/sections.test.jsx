@@ -456,11 +456,11 @@ describe('Review', () => {
     expect(screen.getByText('8')).toBeTruthy();
   });
 
-  it('4e-3: renders heatmap with 91 cells', () => {
+  it('4e-3: renders heatmap for the current week (7 cells)', () => {
     wrap(<Review />, mkCtx({ met: MET, dHist: DHIST }));
     const heatmap = screen.getByTestId('heatmap');
     const cells = heatmap.querySelectorAll('[aria-label*="pomodoros"]');
-    expect(cells.length).toBe(91);
+    expect(cells.length).toBe(7);
   });
 
   it('4e-4: streak section rendered', () => {

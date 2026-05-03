@@ -52,15 +52,20 @@ function streakFromHistory(dHist) {
 }
 
 function buildHeatmapData(dHist) {
-  // Build 13 weeks × 7 days grid, ending today
+  // Build current week (Mon–Sun) of daily pomodoro counts.
   const today = new Date();
+  const day = today.getDay(); // 0 = Sun ... 6 = Sat
+  const offsetToMonday = day === 0 ? -6 : 1 - day;
+  const monday = new Date(today);
+  monday.setDate(today.getDate() + offsetToMonday);
   const cells = [];
-  for (let i = 90; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
     const dateStr = d.toISOString().slice(0, 10);
     const entry = (dHist || []).find((e) => e.date === dateStr);
-    cells.push({ date: dateStr, p: entry?.p || 0 });
+    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    cells.push({ date: dateStr, p: entry?.p || 0, label: labels[i] });
   }
   return cells;
 }
@@ -155,23 +160,21 @@ export function Review() {
           {/* Heatmap */}
           <section aria-label="Activity heatmap">
             <h3 className="text-xs font-bold text-bark/50 uppercase tracking-wide mb-3">
-              Activity — last 13 weeks
+              Activity — this week
             </h3>
             <div
-              className="card p-4 overflow-x-auto"
+              className="card p-4"
               data-testid="heatmap"
             >
-              <div className="grid gap-1" style={{ gridTemplateColumns: 'repeat(13, 1fr)' }}>
-                {Array.from({ length: 13 }, (_, week) => (
-                  <div key={week} className="flex flex-col gap-1">
-                    {heatmapCells.slice(week * 7, week * 7 + 7).map((cell) => (
-                      <div
-                        key={cell.date}
-                        title={`${cell.date}: ${cell.p} pomodoros`}
-                        className={`w-full aspect-square rounded-sm ${pomColor(cell.p)}`}
-                        aria-label={`${cell.date}: ${cell.p} pomodoros`}
-                      />
-                    ))}
+              <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+                {heatmapCells.map((cell) => (
+                  <div key={cell.date} className="flex flex-col items-center gap-1">
+                    <div
+                      title={`${cell.date}: ${cell.p} pomodoros`}
+                      className={`w-full aspect-square rounded-sm ${pomColor(cell.p)}`}
+                      aria-label={`${cell.date}: ${cell.p} pomodoros`}
+                    />
+                    <span className="text-[10px] font-semibold text-bark/40">{cell.label}</span>
                   </div>
                 ))}
               </div>
