@@ -56,7 +56,10 @@ export function Focus() {
           recordPom(getDuration(prev.mode) / 60);
         }
         if (left === 0) {
-          return { ...prev, left: 0, run: false, endAt: null };
+          const pomCycle = prev.mode === 'work'
+            ? ((prev.pomCycle ?? 0) + 1) % 4
+            : (prev.pomCycle ?? 0);
+          return { ...prev, left: 0, run: false, endAt: null, completed: true, pomCycle };
         }
         return { ...prev, left };
       });
@@ -84,27 +87,49 @@ export function Focus() {
       left,
       endAt: now + left * 1000,
       startAt: now,
+      completed: false,
     }));
   };
 
-  const pause = () => {
-    setTimerState((prev) => {
-      const left = computeLeft(prev);
-      return { ...prev, run: false, left, endAt: null };
-    });
-  };
-
-  const reset = () => {
+  const stop = () => {
     chimeRef.current = false;
     const left = getDuration(timerState.mode);
-    setTimerState((prev) => ({ ...prev, run: false, left, endAt: null, startAt: null, elapsed: 0 }));
+    setTimerState((prev) => ({ ...prev, run: false, left, endAt: null, startAt: null, elapsed: 0, completed: false }));
     setDisplay(left);
   };
 
   const switchMode = (mode) => {
     chimeRef.current = false;
     const left = getDuration(mode);
-    setTimerState({ mode, left, run: false, endAt: null, startAt: null, elapsed: 0 });
+    setTimerState((prev) => ({ ...prev, mode, left, run: false, endAt: null, startAt: null, elapsed: 0, completed: false }));
+    setDisplay(left);
+  };
+
+  // Derive next phase after timer completion
+  const nextMode = timerState.completed
+    ? (timerState.mode === 'work'
+        ? (timerState.pomCycle === 0 ? 'long' : 'short')
+        : 'work')
+    : null;
+  const nextModeLabel = nextMode === 'short' ? 'Start Short Break'
+    : nextMode === 'long' ? 'Start Long Break'
+    : 'Start Focus';
+
+  const startNext = () => {
+    if (!nextMode) return;
+    chimeRef.current = false;
+    const left = getDuration(nextMode);
+    const now = Date.now();
+    setTimerState((prev) => ({
+      ...prev,
+      mode: nextMode,
+      left,
+      run: true,
+      endAt: now + left * 1000,
+      startAt: now,
+      elapsed: 0,
+      completed: false,
+    }));
     setDisplay(left);
   };
 
@@ -131,6 +156,22 @@ export function Focus() {
 
   const queueTodos = focus.map((id) => todos.find((t) => t.id === id)).filter(Boolean);
   const availableTodos = todos.filter((t) => !t.done && !focus.includes(t.id));
+
+  // ── Overtime counter (counts up after completion, display-only) ──────────
+
+  const [overTime, setOverTime] = useState(0);
+  const overRef = useRef(null);
+
+  useEffect(() => {
+    if (timerState.completed) {
+      setOverTime(0);
+      overRef.current = setInterval(() => setOverTime((s) => s + 1), 1000);
+    } else {
+      clearInterval(overRef.current);
+      setOverTime(0);
+    }
+    return () => clearInterval(overRef.current);
+  }, [timerState.completed]);
 
   // ── Format time ───────────────────────────────────────────────────────────
 
@@ -172,29 +213,43 @@ export function Focus() {
           progress={progress}
           running={timerState.run}
           mode={timerState.mode}
+          overTime={timerState.completed ? overTime : 0}
         />
 
         {/* Controls */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={reset}
-            className="p-3 rounded-full bg-surface border border-sand text-bark/60 hover:text-bark transition-colors"
-            aria-label="Reset timer"
-          >
-            <I.Reset width={20} height={20} />
-          </button>
+          {/* Left spacer matches wake lock button size */}
+          <div className="w-[46px]" />
 
-          <button
-            onClick={timerState.run ? pause : start}
-            className="w-16 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
-              hover:opacity-90 transition-opacity"
-            aria-label={timerState.run ? 'Pause' : 'Start'}
-          >
-            {timerState.run
-              ? <I.Pause width={24} height={24} />
-              : <I.Play width={24} height={24} />
-            }
-          </button>
+          {timerState.completed ? (
+            <button
+              onClick={startNext}
+              className="px-5 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
+                gap-2 hover:opacity-90 transition-opacity text-sm font-bold"
+              aria-label={nextModeLabel}
+            >
+              <I.Play width={20} height={20} />
+              {nextModeLabel}
+            </button>
+          ) : timerState.run ? (
+            <button
+              onClick={stop}
+              className="w-16 h-16 rounded-full bg-terracotta text-white shadow-lg flex items-center justify-center
+                hover:opacity-90 transition-opacity"
+              aria-label="Stop timer"
+            >
+              <I.Stop width={24} height={24} />
+            </button>
+          ) : (
+            <button
+              onClick={start}
+              className="w-16 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
+                hover:opacity-90 transition-opacity"
+              aria-label="Start"
+            >
+              <I.Play width={24} height={24} />
+            </button>
+          )}
 
           <button
             onClick={toggleWakeLock}
@@ -291,7 +346,7 @@ export function Focus() {
 
 // ── FocusTimer ────────────────────────────────────────────────────────────────
 
-const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, mode }) {
+const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, mode, overTime }) {
   const size = 200;
   const r = 85;
   const circ = 2 * Math.PI * r;
@@ -323,6 +378,11 @@ const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, m
         </span>
         {running && (
           <span className="text-xs font-semibold text-bark/40 mt-1">running</span>
+        )}
+        {overTime > 0 && (
+          <span className="text-xs font-semibold text-terracotta/70 mt-1 tabular-nums">
+            +{fmt(overTime)}
+          </span>
         )}
       </div>
     </div>

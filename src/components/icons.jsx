@@ -324,6 +324,14 @@ function Reset({ width = 18, height = 18, ...props }) {
   );
 }
 
+function Stop({ width = 24, height = 24, ...props }) {
+  return (
+    <svg viewBox="0 0 24 24" width={width} height={height} fill="currentColor" {...props}>
+      <rect x="5" y="5" width="14" height="14" rx="2" />
+    </svg>
+  );
+}
+
 export const I = {
   Plus, X, Check, Dots,
   Trash, Edit, Eye,
@@ -334,6 +342,6 @@ export const I = {
   Link, Unlink,
   QR, Copy, Download, Upload,
   Info, Strike,
-  Timer, Play, Pause, Reset,
+  Timer, Play, Pause, Reset, Stop,
   ExternalLink, BookOpen,
 };
