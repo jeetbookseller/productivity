@@ -125,16 +125,13 @@ function PersonalLink() {
 }
 
 function AppShell() {
-  const { tab, setTab, seenAbout, setSeenAbout, timerState } = useAppDataContext();
-  const [showAbout, setShowAbout] = useState(() => !seenAbout);
+  const { tab, setTab, timerState } = useAppDataContext();
+  const [showAbout, setShowAbout] = useState(false);
   const isWide = useWide();
   const mainRef = useRef(null);
   const { pullY, refreshing } = usePullToRefresh(mainRef, () => window.location.reload());
 
-  const closeAbout = () => {
-    setShowAbout(false);
-    setSeenAbout(true);
-  };
+  const closeAbout = () => setShowAbout(false);
 
   // Live-updating timer badge for nav
   const [timerLeft, setTimerLeft] = useState(() => liveLeft(timerState));
