@@ -91,14 +91,7 @@ export function Focus() {
     }));
   };
 
-  const pause = () => {
-    setTimerState((prev) => {
-      const left = computeLeft(prev);
-      return { ...prev, run: false, left, endAt: null };
-    });
-  };
-
-  const reset = () => {
+  const stop = () => {
     chimeRef.current = false;
     const left = getDuration(timerState.mode);
     setTimerState((prev) => ({ ...prev, run: false, left, endAt: null, startAt: null, elapsed: 0, completed: false }));
@@ -208,13 +201,8 @@ export function Focus() {
 
         {/* Controls */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={reset}
-            className="p-3 rounded-full bg-surface border border-sand text-bark/60 hover:text-bark transition-colors"
-            aria-label="Reset timer"
-          >
-            <I.Reset width={20} height={20} />
-          </button>
+          {/* Left spacer matches wake lock button size */}
+          <div className="w-[46px]" />
 
           {timerState.completed ? (
             <button
@@ -226,17 +214,23 @@ export function Focus() {
               <I.Play width={20} height={20} />
               {nextModeLabel}
             </button>
+          ) : timerState.run ? (
+            <button
+              onClick={stop}
+              className="w-16 h-16 rounded-full bg-terracotta text-white shadow-lg flex items-center justify-center
+                hover:opacity-90 transition-opacity"
+              aria-label="Stop timer"
+            >
+              <I.Stop width={24} height={24} />
+            </button>
           ) : (
             <button
-              onClick={timerState.run ? pause : start}
+              onClick={start}
               className="w-16 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
                 hover:opacity-90 transition-opacity"
-              aria-label={timerState.run ? 'Pause' : 'Start'}
+              aria-label="Start"
             >
-              {timerState.run
-                ? <I.Pause width={24} height={24} />
-                : <I.Play width={24} height={24} />
-              }
+              <I.Play width={24} height={24} />
             </button>
           )}
 
