@@ -227,8 +227,16 @@ export function Review() {
           </section>
         </div>
 
-        {/* Right column / bottom */}
+        {/* Right column / bottom — always reflects current state, not selected week */}
         <div className="space-y-6">
+          {/* Divider shown only on mobile to separate week-scoped content above */}
+          {!isWide && (
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-sand/70" />
+              <span className="text-[10px] font-bold text-bark/30 uppercase tracking-wide">Current</span>
+              <div className="flex-1 h-px bg-sand/70" />
+            </div>
+          )}
           {/* Eisenhower distribution */}
           <section aria-label="Eisenhower distribution">
             <h3 className="text-xs font-bold text-bark/50 uppercase tracking-wide mb-3">
