@@ -15,21 +15,18 @@ const STEPS = [
 
 export function AppExplainer() {
   return (
-    <div className="space-y-3">
-      <p className="text-xs font-bold text-bark/50 uppercase tracking-wide">🌿 How it works</p>
+    <div className="space-y-1.5">
+      <p className="text-[10px] font-bold text-bark/40 uppercase tracking-wide mb-2">🌿 How it works</p>
       {STEPS.map(({ icon, step, desc }) => (
-        <div key={step} className="flex gap-3 items-start">
-          <span className="text-base leading-snug flex-shrink-0">{icon}</span>
-          <p className="text-sm font-semibold text-bark/70 leading-snug">
-            <span className="font-bold text-bark">{step}</span>
+        <div key={step} className="flex gap-2 items-baseline">
+          <span className="text-xs flex-shrink-0">{icon}</span>
+          <p className="text-xs text-bark/60 leading-snug">
+            <span className="font-bold text-bark/80">{step}</span>
             {' — '}
             {desc}
           </p>
         </div>
       ))}
-      <p className="text-xs font-bold text-bark/40 tracking-wide text-center pt-1">
-        Capture → Clarify → Focus → Confirm → Review → Repeat
-      </p>
     </div>
   );
 }
