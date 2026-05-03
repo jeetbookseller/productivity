@@ -391,13 +391,6 @@ export default function AuthForm() {
           )}
         </div>
 
-        {/* App explainer — login and signup only */}
-        {(mode === 'login' || (mode === 'signup' && !signupDone)) && (
-          <div className="mt-6 bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm p-5">
-            <AppExplainer />
-          </div>
-        )}
-
         {/* Footer mode-switch links */}
         <div className="mt-4 text-center">
           {mode === 'login' && (
@@ -437,6 +430,13 @@ export default function AuthForm() {
             </span>
           )}
         </div>
+
+        {/* App explainer — login and signup only */}
+        {(mode === 'login' || (mode === 'signup' && !signupDone)) && (
+          <div className="mt-6 bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm p-5">
+            <AppExplainer />
+          </div>
+        )}
       </div>
     </div>
   );
