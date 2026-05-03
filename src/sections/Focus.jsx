@@ -157,6 +157,22 @@ export function Focus() {
   const queueTodos = focus.map((id) => todos.find((t) => t.id === id)).filter(Boolean);
   const availableTodos = todos.filter((t) => !t.done && !focus.includes(t.id));
 
+  // ── Overtime counter (counts up after completion, display-only) ──────────
+
+  const [overTime, setOverTime] = useState(0);
+  const overRef = useRef(null);
+
+  useEffect(() => {
+    if (timerState.completed) {
+      setOverTime(0);
+      overRef.current = setInterval(() => setOverTime((s) => s + 1), 1000);
+    } else {
+      clearInterval(overRef.current);
+      setOverTime(0);
+    }
+    return () => clearInterval(overRef.current);
+  }, [timerState.completed]);
+
   // ── Format time ───────────────────────────────────────────────────────────
 
   const fmt = (secs) => {
@@ -197,6 +213,7 @@ export function Focus() {
           progress={progress}
           running={timerState.run}
           mode={timerState.mode}
+          overTime={timerState.completed ? overTime : 0}
         />
 
         {/* Controls */}
@@ -329,7 +346,7 @@ export function Focus() {
 
 // ── FocusTimer ────────────────────────────────────────────────────────────────
 
-const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, mode }) {
+const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, mode, overTime }) {
   const size = 200;
   const r = 85;
   const circ = 2 * Math.PI * r;
@@ -361,6 +378,11 @@ const FocusTimer = memo(function FocusTimer({ display, fmt, progress, running, m
         </span>
         {running && (
           <span className="text-xs font-semibold text-bark/40 mt-1">running</span>
+        )}
+        {overTime > 0 && (
+          <span className="text-xs font-semibold text-terracotta/70 mt-1 tabular-nums">
+            +{fmt(overTime)}
+          </span>
         )}
       </div>
     </div>
