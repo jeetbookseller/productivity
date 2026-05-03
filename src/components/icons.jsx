@@ -92,6 +92,15 @@ function ChevronRight({ width = 18, height = 18, ...props }) {
   );
 }
 
+function ChevronLeft({ width = 18, height = 18, ...props }) {
+  return (
+    <svg viewBox="0 0 24 24" width={width} height={height} fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  );
+}
+
 function ArrowRight({ width = 18, height = 18, ...props }) {
   return (
     <svg viewBox="0 0 24 24" width={width} height={height} fill="none"
@@ -318,7 +327,7 @@ function Reset({ width = 18, height = 18, ...props }) {
 export const I = {
   Plus, X, Check, Dots,
   Trash, Edit, Eye,
-  ChevronDown, ChevronRight,
+  ChevronDown, ChevronRight, ChevronLeft,
   ArrowRight, Share,
   Clock, Zap,
   Checkbox, CheckboxChecked, CheckboxMinus,

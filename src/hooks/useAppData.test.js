@@ -298,16 +298,17 @@ describe('useAppData — metrics (Review)', () => {
     expect(result.current.met.w.m).toBe(25);
   });
 
-  it('T1-30: recordPom creates a new dHist entry for today', () => {
+  it('T1-30: recordPom creates a new dHist entry with p and m for today', () => {
     const { result } = renderHook(() => useAppData());
     const today = new Date().toISOString().slice(0, 10);
     act(() => { result.current.recordPom(25); });
     const entry = result.current.dHist.find((e) => e.date === today);
     expect(entry).toBeDefined();
     expect(entry.p).toBe(1);
+    expect(entry.m).toBe(25);
   });
 
-  it('T1-31: recordPom increments existing dHist entry when called again same day', () => {
+  it('T1-31: recordPom increments existing dHist entry p and m when called again same day', () => {
     const { result } = renderHook(() => useAppData());
     const today = new Date().toISOString().slice(0, 10);
     act(() => { result.current.recordPom(25); });
@@ -315,6 +316,18 @@ describe('useAppData — metrics (Review)', () => {
     const entries = result.current.dHist.filter((e) => e.date === today);
     expect(entries).toHaveLength(1);
     expect(entries[0].p).toBe(2);
+    expect(entries[0].m).toBe(50);
+  });
+
+  it('T1-36: recordTaskDone stores t in dHist entry for today', () => {
+    const { result } = renderHook(() => useAppData());
+    const today = new Date().toISOString().slice(0, 10);
+    let id;
+    act(() => { id = result.current.addTodo('task').id; });
+    act(() => { result.current.toggleTodo(id); });
+    const entry = result.current.dHist.find((e) => e.date === today);
+    expect(entry).toBeDefined();
+    expect(entry.t).toBe(1);
   });
 
   it('T1-32: toggleTodo increments met task counts when completing a todo', () => {

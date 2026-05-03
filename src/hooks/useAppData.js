@@ -315,10 +315,10 @@ export function useAppData() {
       const idx = prev.findIndex(e => e.date === today);
       if (idx !== -1) {
         const next = [...prev];
-        next[idx] = { ...next[idx], p: next[idx].p + 1 };
+        next[idx] = { ...next[idx], p: next[idx].p + 1, m: (next[idx].m || 0) + minutes };
         return next;
       }
-      return [...prev, { date: today, p: 1 }];
+      return [...prev, { date: today, p: 1, t: 0, m: minutes }];
     });
   };
 
@@ -331,6 +331,15 @@ export function useAppData() {
       const d = { ...prevD, t: prevD.t + 1 };
       const w = { ...prevW, t: prevW.t + 1 };
       return { d, w };
+    });
+    setDHist((prev) => {
+      const idx = prev.findIndex(e => e.date === today);
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], t: (next[idx].t || 0) + 1 };
+        return next;
+      }
+      return [...prev, { date: today, p: 0, t: 1, m: 0 }];
     });
   };
 
