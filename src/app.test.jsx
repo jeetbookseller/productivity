@@ -48,8 +48,8 @@ describe('App Shell', () => {
   it('T2-14: clicking a nav tab renders the corresponding section', () => {
     render(<App />);
     fireEvent.click(screen.getByLabelText('Go to Clarify'));
-    expect(screen.getByText('Do First')).toBeTruthy();
-    expect(screen.getByText('Schedule')).toBeTruthy();
+    expect(screen.getByText('Urgent + Important')).toBeTruthy();
+    expect(screen.getByText('Not Urgent + Important')).toBeTruthy();
   });
 
   it('T2-15: active tab button has aria-current="page"', () => {

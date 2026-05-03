@@ -207,10 +207,10 @@ describe('Clarify', () => {
 
   it('4b-2: all 4 quadrant headers rendered', () => {
     wrap(<Clarify />, mkCtx());
-    expect(screen.getByText('Do First')).toBeTruthy();
-    expect(screen.getByText('Schedule')).toBeTruthy();
-    expect(screen.getByText('Delegate')).toBeTruthy();
-    expect(screen.getByText('Eliminate')).toBeTruthy();
+    expect(screen.getByText('Urgent + Important')).toBeTruthy();
+    expect(screen.getByText('Not Urgent + Important')).toBeTruthy();
+    expect(screen.getByText('Urgent + Not Important')).toBeTruthy();
+    expect(screen.getByText('Not Urgent + Not Important')).toBeTruthy();
   });
 
   it('4b-3: clicking task calls toggleTodo', () => {
@@ -480,7 +480,7 @@ describe('Review', () => {
       { id: 't2', quad: 'ni', done: false },
     ];
     wrap(<Review />, mkCtx({ todos, met: MET, dHist: DHIST }));
-    expect(screen.getByText('Do First')).toBeTruthy();
+    expect(screen.getByText('Urgent + Important')).toBeTruthy();
   });
 });
 

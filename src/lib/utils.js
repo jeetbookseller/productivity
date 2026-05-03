@@ -100,8 +100,8 @@ export const PRESETS = {
 export const QUADS = {
   ui: {
     key: 'ui',
-    label: 'Do First',
-    sub: 'Urgent + Important',
+    label: 'Urgent + Important',
+    sub: 'Do First',
     color: 'terracotta',
     bg: 'bg-terracotta/10',
     border: 'border-terracotta/30',
@@ -109,8 +109,8 @@ export const QUADS = {
   },
   ni: {
     key: 'ni',
-    label: 'Schedule',
-    sub: 'Not Urgent + Important',
+    label: 'Not Urgent + Important',
+    sub: 'Schedule',
     color: 'ocean',
     bg: 'bg-ocean/10',
     border: 'border-ocean/30',
@@ -118,8 +118,8 @@ export const QUADS = {
   },
   un: {
     key: 'un',
-    label: 'Delegate',
-    sub: 'Urgent + Not Important',
+    label: 'Urgent + Not Important',
+    sub: 'Delegate',
     color: 'sand',
     bg: 'bg-sand/50',
     border: 'border-sand',
@@ -127,8 +127,8 @@ export const QUADS = {
   },
   nn: {
     key: 'nn',
-    label: 'Eliminate',
-    sub: 'Not Urgent + Not Important',
+    label: 'Not Urgent + Not Important',
+    sub: 'Eliminate',
     color: 'lavender',
     bg: 'bg-lavender/10',
     border: 'border-lavender/30',
