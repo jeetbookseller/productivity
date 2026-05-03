@@ -337,6 +337,39 @@ describe('useAppData — metrics (Review)', () => {
     expect(result.current.met.d.t).toBe(1); // still 1
     expect(result.current.met.w.t).toBe(1);
   });
+
+  it('T1-34: weekly metrics reset when a new week starts', () => {
+    vi.useFakeTimers();
+    try {
+      // Set time to a date in a past week.
+      vi.setSystemTime(new Date('2024-01-03T12:00:00Z')); // Wed
+      const { result } = renderHook(() => useAppData());
+      act(() => { result.current.recordPom(25); });
+      let id;
+      act(() => { id = result.current.addTodo('x').id; });
+      act(() => { result.current.toggleTodo(id); });
+      expect(result.current.met.w.p).toBe(1);
+      expect(result.current.met.w.t).toBe(1);
+
+      // Jump forward to a different ISO week.
+      vi.setSystemTime(new Date('2024-01-15T12:00:00Z')); // Mon, next-next week
+      act(() => { result.current.recordPom(25); });
+      expect(result.current.met.w.p).toBe(1); // reset, then incremented
+      expect(result.current.met.w.t).toBe(0); // reset
+      expect(result.current.met.w.m).toBe(25);
+      expect(result.current.met.w.weekStart).toBe('2024-01-15');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('T1-35: weekly metrics accumulate within the same week', () => {
+    const { result } = renderHook(() => useAppData());
+    act(() => { result.current.recordPom(25); });
+    act(() => { result.current.recordPom(25); });
+    expect(result.current.met.w.p).toBe(2);
+    expect(result.current.met.w.m).toBe(50);
+  });
 });
 
 describe('useAppData — focus queue', () => {
