@@ -433,7 +433,7 @@ export default function AuthForm() {
 
         {/* App explainer — login and signup only */}
         {(mode === 'login' || (mode === 'signup' && !signupDone)) && (
-          <div className="mt-6 bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm p-5">
+          <div className="mt-4 bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm px-4 py-3">
             <AppExplainer />
           </div>
         )}
