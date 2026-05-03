@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from './AuthProvider.jsx';
+import { AppExplainer } from './AboutModal.jsx';
 
 function getPasswordChecks(password) {
   return [
@@ -137,7 +138,7 @@ export default function AuthForm() {
     'w-full py-2.5 rounded-xl bg-sage text-white text-sm font-bold hover:opacity-90 transition-opacity disabled:opacity-40 flex items-center justify-center gap-2';
 
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center bg-cream p-4">
+    <div className="min-h-[100dvh] flex items-start justify-center bg-cream p-4 pt-12">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <span className="text-sm font-semibold tracking-wide text-bark/50 uppercase">
@@ -389,6 +390,13 @@ export default function AuthForm() {
             </>
           )}
         </div>
+
+        {/* App explainer — login and signup only */}
+        {(mode === 'login' || (mode === 'signup' && !signupDone)) && (
+          <div className="mt-6 bg-[rgb(var(--surface))] border border-sand rounded-2xl shadow-sm p-5">
+            <AppExplainer />
+          </div>
+        )}
 
         {/* Footer mode-switch links */}
         <div className="mt-4 text-center">

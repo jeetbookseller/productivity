@@ -30,8 +30,17 @@ export function useAppDataContext() {
 
 const DEFAULT_MET = {
   d: { p: 0, t: 0, m: 0, date: '' },
-  w: { p: 0, t: 0, m: 0 },
+  w: { p: 0, t: 0, m: 0, weekStart: '' },
 };
+
+// Monday-anchored ISO week start for a given YYYY-MM-DD string.
+function getWeekStart(dateStr) {
+  const d = new Date(dateStr);
+  const day = d.getDay(); // 0 = Sun ... 6 = Sat
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d.toISOString().slice(0, 10);
+}
 
 const DEFAULT_TIMER = {
   mode: 'work', left: 25 * 60, run: false,
@@ -293,29 +302,44 @@ export function useAppData() {
 
   const recordPom = (minutes = 25) => {
     const today = new Date().toISOString().slice(0, 10);
+    const weekStart = getWeekStart(today);
     setPoms((p) => p + 1);
     setMet((m) => {
-      const prevD = m.d.date === today ? m.d : { p: 0, t: m.d.t, m: 0, date: today };
+      const prevD = m.d.date === today ? m.d : { p: 0, t: 0, m: 0, date: today };
+      const prevW = m.w.weekStart === weekStart ? m.w : { p: 0, t: 0, m: 0, weekStart };
       const d = { ...prevD, p: prevD.p + 1, m: prevD.m + minutes };
-      return { d, w: { ...m.w, p: m.w.p + 1, m: m.w.m + minutes } };
+      const w = { ...prevW, p: prevW.p + 1, m: prevW.m + minutes };
+      return { d, w };
     });
     setDHist((prev) => {
       const idx = prev.findIndex(e => e.date === today);
       if (idx !== -1) {
         const next = [...prev];
-        next[idx] = { ...next[idx], p: next[idx].p + 1 };
+        next[idx] = { ...next[idx], p: next[idx].p + 1, m: (next[idx].m || 0) + minutes };
         return next;
       }
-      return [...prev, { date: today, p: 1 }];
+      return [...prev, { date: today, p: 1, t: 0, m: minutes }];
     });
   };
 
   const recordTaskDone = () => {
     const today = new Date().toISOString().slice(0, 10);
+    const weekStart = getWeekStart(today);
     setMet((m) => {
-      const prevD = m.d.date === today ? m.d : { p: m.d.p, t: 0, m: m.d.m, date: today };
+      const prevD = m.d.date === today ? m.d : { p: 0, t: 0, m: 0, date: today };
+      const prevW = m.w.weekStart === weekStart ? m.w : { p: 0, t: 0, m: 0, weekStart };
       const d = { ...prevD, t: prevD.t + 1 };
-      return { d, w: { ...m.w, t: m.w.t + 1 } };
+      const w = { ...prevW, t: prevW.t + 1 };
+      return { d, w };
+    });
+    setDHist((prev) => {
+      const idx = prev.findIndex(e => e.date === today);
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = { ...next[idx], t: (next[idx].t || 0) + 1 };
+        return next;
+      }
+      return [...prev, { date: today, p: 0, t: 1, m: 0 }];
     });
   };
 
