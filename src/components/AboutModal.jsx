@@ -13,6 +13,27 @@ const STEPS = [
   { icon: '📊', step: 'Review',   desc: 'Weekly stats, streaks & insights.' },
 ];
 
+export function AppExplainer() {
+  return (
+    <div className="space-y-3">
+      <p className="text-xs font-bold text-bark/50 uppercase tracking-wide">🌿 How it works</p>
+      {STEPS.map(({ icon, step, desc }) => (
+        <div key={step} className="flex gap-3 items-start">
+          <span className="text-base leading-snug flex-shrink-0">{icon}</span>
+          <p className="text-sm font-semibold text-bark/70 leading-snug">
+            <span className="font-bold text-bark">{step}</span>
+            {' — '}
+            {desc}
+          </p>
+        </div>
+      ))}
+      <p className="text-xs font-bold text-bark/40 tracking-wide text-center pt-1">
+        Capture → Clarify → Focus → Confirm → Review → Repeat
+      </p>
+    </div>
+  );
+}
+
 export function AboutModal({ open, onClose }) {
   useEffect(() => {
     if (!open) return;
@@ -44,33 +65,10 @@ export function AboutModal({ open, onClose }) {
         {/* Content — flat non-collapsible */}
         <div className="overflow-y-auto flex-1">
           <div className="px-5 py-4 space-y-4">
-
-            <p className="text-sm font-bold text-bark">🌿 About Productivity</p>
-
-            {/* 5 steps */}
-            <div className="space-y-3">
-              {STEPS.map(({ icon, step, desc }) => (
-                <div key={step} className="flex gap-3 items-start">
-                  <span className="text-base leading-snug flex-shrink-0">{icon}</span>
-                  <p className="text-sm font-semibold text-bark/80 leading-snug">
-                    <span className="font-bold text-bark">{step}</span>
-                    {' — '}
-                    {desc}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            {/* Workflow tagline */}
-            <p className="text-xs font-bold text-bark/50 tracking-wide text-center pt-1">
-              Capture → Clarify → Focus → Confirm → Review → Repeat
-            </p>
-
-            {/* Footer note */}
+            <AppExplainer />
             <p className="text-xs font-semibold text-bark/50 text-center border-t border-sand pt-3">
               📚 Visit <span className="font-bold text-bark/70">Settings</span> → Methodologies for the full guide
             </p>
-
           </div>
         </div>
       </div>
