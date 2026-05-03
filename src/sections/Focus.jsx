@@ -56,7 +56,10 @@ export function Focus() {
           recordPom(getDuration(prev.mode) / 60);
         }
         if (left === 0) {
-          return { ...prev, left: 0, run: false, endAt: null };
+          const pomCycle = prev.mode === 'work'
+            ? ((prev.pomCycle ?? 0) + 1) % 4
+            : (prev.pomCycle ?? 0);
+          return { ...prev, left: 0, run: false, endAt: null, completed: true, pomCycle };
         }
         return { ...prev, left };
       });
@@ -84,6 +87,7 @@ export function Focus() {
       left,
       endAt: now + left * 1000,
       startAt: now,
+      completed: false,
     }));
   };
 
@@ -97,14 +101,42 @@ export function Focus() {
   const reset = () => {
     chimeRef.current = false;
     const left = getDuration(timerState.mode);
-    setTimerState((prev) => ({ ...prev, run: false, left, endAt: null, startAt: null, elapsed: 0 }));
+    setTimerState((prev) => ({ ...prev, run: false, left, endAt: null, startAt: null, elapsed: 0, completed: false }));
     setDisplay(left);
   };
 
   const switchMode = (mode) => {
     chimeRef.current = false;
     const left = getDuration(mode);
-    setTimerState({ mode, left, run: false, endAt: null, startAt: null, elapsed: 0 });
+    setTimerState((prev) => ({ ...prev, mode, left, run: false, endAt: null, startAt: null, elapsed: 0, completed: false }));
+    setDisplay(left);
+  };
+
+  // Derive next phase after timer completion
+  const nextMode = timerState.completed
+    ? (timerState.mode === 'work'
+        ? (timerState.pomCycle === 0 ? 'long' : 'short')
+        : 'work')
+    : null;
+  const nextModeLabel = nextMode === 'short' ? 'Start Short Break'
+    : nextMode === 'long' ? 'Start Long Break'
+    : 'Start Focus';
+
+  const startNext = () => {
+    if (!nextMode) return;
+    chimeRef.current = false;
+    const left = getDuration(nextMode);
+    const now = Date.now();
+    setTimerState((prev) => ({
+      ...prev,
+      mode: nextMode,
+      left,
+      run: true,
+      endAt: now + left * 1000,
+      startAt: now,
+      elapsed: 0,
+      completed: false,
+    }));
     setDisplay(left);
   };
 
@@ -184,17 +216,29 @@ export function Focus() {
             <I.Reset width={20} height={20} />
           </button>
 
-          <button
-            onClick={timerState.run ? pause : start}
-            className="w-16 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
-              hover:opacity-90 transition-opacity"
-            aria-label={timerState.run ? 'Pause' : 'Start'}
-          >
-            {timerState.run
-              ? <I.Pause width={24} height={24} />
-              : <I.Play width={24} height={24} />
-            }
-          </button>
+          {timerState.completed ? (
+            <button
+              onClick={startNext}
+              className="px-5 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
+                gap-2 hover:opacity-90 transition-opacity text-sm font-bold"
+              aria-label={nextModeLabel}
+            >
+              <I.Play width={20} height={20} />
+              {nextModeLabel}
+            </button>
+          ) : (
+            <button
+              onClick={timerState.run ? pause : start}
+              className="w-16 h-16 rounded-full bg-sage text-white shadow-lg flex items-center justify-center
+                hover:opacity-90 transition-opacity"
+              aria-label={timerState.run ? 'Pause' : 'Start'}
+            >
+              {timerState.run
+                ? <I.Pause width={24} height={24} />
+                : <I.Play width={24} height={24} />
+              }
+            </button>
+          )}
 
           <button
             onClick={toggleWakeLock}

@@ -45,6 +45,7 @@ function getWeekStart(dateStr) {
 const DEFAULT_TIMER = {
   mode: 'work', left: 25 * 60, run: false,
   endAt: null, startAt: null, elapsed: 0,
+  pomCycle: 0, completed: false,
 };
 
 // ── Main hook ──────────────────────────────────────────────────────────────────

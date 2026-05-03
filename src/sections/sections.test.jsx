@@ -61,7 +61,7 @@ function mkCtx(overrides = {}) {
     // Metrics
     recordPom: vi.fn(), recordTaskDone: vi.fn(),
     // Timer
-    timerState: { mode: 'work', left: 25 * 60, run: false, endAt: null, startAt: null, elapsed: 0 },
+    timerState: { mode: 'work', left: 25 * 60, run: false, endAt: null, startAt: null, elapsed: 0, pomCycle: 0, completed: false },
     setTimerState: vi.fn(),
     ...overrides,
   };
